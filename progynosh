@@ -1,0 +1,125 @@
+#!/usr/bin/fish
+function checkdependence
+  if test -e $argv
+    echo -e "\033[32m[checkdependence]check passed - $argv exist\033[0m"
+  else
+    echo -e "\033[0;31m[checkdependence]check failed - plz install $argv\033[0m"
+    exit
+  end
+end
+function dir_exist
+  if test -d $argv[1]
+    echo -e "\033[32m[checkdir]check passed - dir $argv[1] exist\033[0m"
+  else
+    echo -e "\033[0;31m[checkdir]check failed - dir $argv[1] doesn't exist,going to makr one\033[0m"
+    mkdir $argv[1]
+  end
+end
+function build
+  set -g build_time (date +"%Y-%m-%d_%T" -u)
+  set -g build_output $argv[1]
+  if [ "$argv[1]" = "" ]
+    set -g build_output app
+  end
+  function app_fish_empty
+    if test -e $build_output
+      set_color red
+        echo "[Progynosh]A file this name existed,delete it anyway?[y/n]"
+      set_color normal
+      read -P "[Progynosh] >>>" _delete_var_
+      switch $_delete_var_
+      case y
+        rm $build_output
+      case n '*'
+        echo "[Progynosh]Aborted"
+	      exit
+      end
+    end
+  end
+  app_fish_empty
+  for mod in (cat pynsh.mod)
+    cat fish_libs/libs/$mod >> $build_output
+  end
+  cat fish_libs/apps/* >> $build_output
+  cat fish_libs/main.fish >> $build_output
+  echo "#build time UTC = $build_time" >> $build_output
+  chmod +x $build_output
+  set -e build_output
+  set_color green
+  echo "[Progynosh]Built"
+  set_color normal
+end
+function help_echo
+  set_color cyan
+  echo "Progynosh fish script build system | RuzhTaiWan [R] 2017-2021"
+  set_color normal
+  echo "==========Help Documentation=========="
+  set_color green
+  echo "(./)progynosh argv[1]"
+  set_color normal
+  echo " -argv[1]:the command to execute"
+  echo "  -Available:
+             install >>> install to /usr/bin
+             uninstall >>> remove from /usr/bin
+             init >>> Download and deploy the core file and structure for pynsh
+             build argv[2] >>> Combine the progynosh script file to one fish shell script
+              -argv[2] : Set the name of output file"
+  set_color yellow
+  echo "Remember,do this in the project dir,otherwish your root dir will full of pynsh files"
+  set_color normal
+  echo "========================================"
+end
+function init
+  checkdependence /usr/bin/curl
+  checkdependence /usr/bin/tar
+  dir_exist ~/.cache/progynosh
+  if test -e ~/.cache/progynosh/structure.tar
+    tar xf ~/.cache/progynosh/structure.tar
+    set_color green
+    echo "[Progynosh]Deployed"
+    set_color normal
+  else
+    set_color red
+    echo "[Progynosh]No structure cached,fetching"
+    set_color normal
+    curl -s -o ~/.cache/progynosh/structure.tar 'https://bluelakelab.ruzhtw.top/files/progynosh/progynosh.tar'
+    set_color yellow
+    echo "[Progynosh]Fetched structure tar"
+    set_color normal
+    tar xf ~/.cache/progynosh/structure.tar
+    set_color green
+    echo "[Progynosh]Deployed"
+    set_color normal
+  end
+end
+function install
+set dir (realpath (dirname (status -f)))
+set filename (status --current-filename)
+chmod +x $dir/$filename
+sudo cp $dir/$filename /usr/bin/progynosh
+set_color green
+echo "[Progynosh]Installed"
+set_color normal
+end
+function uninstall
+  sudo rm /usr/bin/progynosh
+  set_color green
+  echo "[Progynosh]Removed"
+  set_color normal
+end
+set_color cyan
+echo "[Progynosh]progynosh fish shell script dev manager | RuzhTaiWan [R] 2017-2021"
+set_color normal
+switch $argv[1]
+case install
+  install
+case uninstall
+  uninstall
+case init
+  init
+case build
+  build $argv[2]
+case h help '*'
+  help_echo
+end
+#build time UTC = 2021-10-23_04:44:46
