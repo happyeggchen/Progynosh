@@ -10,6 +10,8 @@ case init
   init
 case build
   build $argv[2]
+case get
+  get $argv[2]
 case h help '*'
   help_echo
 end

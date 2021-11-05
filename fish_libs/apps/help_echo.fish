@@ -12,7 +12,9 @@ function help_echo
              uninstall >>> remove from /usr/bin
              init >>> Download and deploy the core file and structure for pynsh
              build argv[2] >>> Combine the progynosh script file to one fish shell script
-              -argv[2] : Set the name of output file"
+              -argv[2] : Set the name of output file
+             get argv[2] >>> get libs from online repo
+              -argv[2] : Name of the libs , view the list on github.com/bluelakelab/progynosh-script-source"
   set_color yellow
   echo "Remember,do this in the project dir,otherwish your root dir will full of pynsh files"
   set_color normal

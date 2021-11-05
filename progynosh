@@ -1,10 +1,17 @@
-#!/usr/bin/fish
+#!/usr/bin/env fish
 function checkdependence
   if test -e $argv
     echo -e "\033[32m[checkdependence]check passed - $argv exist\033[0m"
   else
     echo -e "\033[0;31m[checkdependence]check failed - plz install $argv\033[0m"
     exit
+  end
+end
+function checknetwork
+  if curl -s -L $argv[1] | grep -q $argv[2]
+    echo -e "\033[32m[checknetwork]check passed - u`ve connected to $argv[1]\033[0m"
+  else
+    echo -e "\033[0;31m[checknetwork]check failed - check your network connection\033[0m"
   end
 end
 function dir_exist
@@ -14,6 +21,10 @@ function dir_exist
     echo -e "\033[0;31m[checkdir]check failed - dir $argv[1] doesn't exist,going to makr one\033[0m"
     mkdir $argv[1]
   end
+end
+#!/usr/bin/fish
+function list_menu
+ls $argv | sed '\~//~d'
 end
 function build
   set -g build_time (date +"%Y-%m-%d_%T" -u)
@@ -49,6 +60,20 @@ function build
   echo "[Progynosh]Built"
   set_color normal
 end
+function get -d "get libs from online repo"
+  set -g modulename $argv[1]
+  if [ "$argv[1]" = "" ]
+    set_color red
+    echo "[progynosh]Unexpect input"
+    set_color normal
+    exit
+  end
+  cd fish_libs/libs
+  wget "https://github.com/happyeggchen/progynosh-script-source/raw/main/$modulename/$modulename"
+  set_color cyan
+  echo "[progynosh]Processed"
+  set_color normal
+end
 function help_echo
   set_color cyan
   echo "Progynosh fish script build system | RuzhTaiWan [R] 2017-2021"
@@ -63,7 +88,9 @@ function help_echo
              uninstall >>> remove from /usr/bin
              init >>> Download and deploy the core file and structure for pynsh
              build argv[2] >>> Combine the progynosh script file to one fish shell script
-              -argv[2] : Set the name of output file"
+              -argv[2] : Set the name of output file
+             get argv[2] >>> get libs from online repo
+              -argv[2] : Name of the libs , view the list on github.com/bluelakelab/progynosh-script-source"
   set_color yellow
   echo "Remember,do this in the project dir,otherwish your root dir will full of pynsh files"
   set_color normal
@@ -119,7 +146,9 @@ case init
   init
 case build
   build $argv[2]
+case get
+  get $argv[2]
 case h help '*'
   help_echo
 end
-#build time UTC = 2021-10-23_04:44:46
+#build time UTC = 2021-11-05_10:52:03
