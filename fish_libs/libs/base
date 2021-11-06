@@ -21,7 +21,6 @@ function dir_exist
     mkdir $argv[1]
   end
 end
-#!/usr/bin/fish
 function list_menu
 ls $argv | sed '\~//~d'
 end

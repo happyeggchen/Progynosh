@@ -1,5 +1,5 @@
 set_color cyan
-echo "[Progynosh]progynosh fish shell script dev manager | RuzhTaiWan [R] 2017-2021"
+echo "[Progynosh]progynosh fish shell script dev manager | by tsingkwai@protonmail.com (tsingkwai.ruzhtw.top)"
 set_color normal
 switch $argv[1]
 case install
