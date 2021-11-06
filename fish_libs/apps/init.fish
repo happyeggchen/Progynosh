@@ -11,7 +11,7 @@ function init
     set_color red
     echo "[Progynosh]No structure cached,fetching"
     set_color normal
-    curl -s -o ~/.cache/progynosh/structure.tar 'https://bluelakelab.ruzhtw.top/files/progynosh/progynosh.tar'
+    curl -s -o ~/.cache/progynosh/structure.tar 'https://tsingkwai.ruzhtw.top/files/progynosh/progynosh.tar'
     set_color yellow
     echo "[Progynosh]Fetched structure tar"
     set_color normal
