@@ -12,6 +12,8 @@ case build
   build $argv[2]
 case get
   get $argv[2]
+case push
+  push
 case h help '*'
   help_echo
 end
