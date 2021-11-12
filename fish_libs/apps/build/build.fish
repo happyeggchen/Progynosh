@@ -30,7 +30,9 @@ function build
       cat fish_libs/apps/$dir_select >> $build_output
     end
   end
-  echo "echo build_time: $build_time" >> $build_output
+  echo "set_color yellow
+  echo Build_Time_UTC=$build_time
+  set_color normal" >> $build_output
   cat fish_libs/main.fish >> $build_output
   chmod +x $build_output
   set -e build_output
