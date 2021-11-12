@@ -176,7 +176,7 @@ function uninstall
   set_color normal
 end
 set_color yellow
-  echo Build_Time_UTC=2021-11-12_13:35:11
+  echo Build_Time_UTC=2021-11-12_13:38:34
   set_color normal
 set_color cyan
 echo "[Progynosh]progynosh fish shell script dev manager | by tsingkwai@protonmail.com (tsingkwai.ruzhtw.top)"
