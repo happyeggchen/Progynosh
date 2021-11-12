@@ -1,7 +1,4 @@
 function help_echo
-  set_color cyan
-  echo "Progynosh fish script build system | RuzhTaiWan [R] 2017-2021"
-  set_color normal
   echo "==========Help Documentation=========="
   set_color green
   echo "(./)progynosh argv[1]"

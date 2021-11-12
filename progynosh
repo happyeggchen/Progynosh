@@ -137,9 +137,6 @@ function get -d "get libs from online repo"
   set_color normal
 end
 function help_echo
-  set_color cyan
-  echo "Progynosh fish script build system | RuzhTaiWan [R] 2017-2021"
-  set_color normal
   echo "==========Help Documentation=========="
   set_color green
   echo "(./)progynosh argv[1]"
@@ -180,7 +177,7 @@ function uninstall
   set_color normal
 end
 set_color yellow
-echo Build_Time_UTC=2021-11-12_14:19:52
+echo Build_Time_UTC=2021-11-12_14:27:22
 set_color normal
 set_color cyan
 echo "[Progynosh]progynosh fish shell script dev manager | by tsingkwai@protonmail.com (tsingkwai.ruzhtw.top)"
