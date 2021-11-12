@@ -52,7 +52,11 @@ function build
   end
   for dir_select in (ls fish_libs/apps/)
     if test -d fish_libs/apps/$dir_select
-      cat fish_libs/apps/$dir_select/** >> $build_output
+      set dir_select_empty (ls fish_libs/apps/$dir_select 2&>/dev/null)
+      if [ "$dir_select_empty" = "" ]
+      else
+        cat fish_libs/apps/$dir_select/** >> $build_output
+      end
     else
       cat fish_libs/apps/$dir_select >> $build_output
     end
@@ -176,7 +180,7 @@ function uninstall
   set_color normal
 end
 set_color yellow
-  echo Build_Time_UTC=2021-11-12_13:38:34
+  echo Build_Time_UTC=2021-11-12_14:06:13
   set_color normal
 set_color cyan
 echo "[Progynosh]progynosh fish shell script dev manager | by tsingkwai@protonmail.com (tsingkwai.ruzhtw.top)"

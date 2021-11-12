@@ -25,7 +25,11 @@ function build
   end
   for dir_select in (ls fish_libs/apps/)
     if test -d fish_libs/apps/$dir_select
-      cat fish_libs/apps/$dir_select/** >> $build_output
+      set dir_select_empty (ls fish_libs/apps/$dir_select 2&>/dev/null)
+      if [ "$dir_select_empty" = "" ]
+      else
+        cat fish_libs/apps/$dir_select/** >> $build_output
+      end
     else
       cat fish_libs/apps/$dir_select >> $build_output
     end
