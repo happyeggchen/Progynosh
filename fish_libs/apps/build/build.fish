@@ -25,8 +25,8 @@ function build
   end
   for dir_select in (ls fish_libs/apps/)
     if test -d fish_libs/apps/$dir_select
-      set dir_select_empty (ls fish_libs/apps/$dir_select 2&>/dev/null)
-      if [ "$dir_select_empty" = "" ]
+      set dir_select_empty (ls -A fish_libs/apps/$dir_select)
+      if test -z "$dir_select_empty"
       else
         cat fish_libs/apps/$dir_select/** >> $build_output
       end
@@ -35,8 +35,8 @@ function build
     end
   end
   echo "set_color yellow
-  echo Build_Time_UTC=$build_time
-  set_color normal" >> $build_output
+echo Build_Time_UTC=$build_time
+set_color normal" >> $build_output
   cat fish_libs/main.fish >> $build_output
   chmod +x $build_output
   set -e build_output
