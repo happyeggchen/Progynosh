@@ -50,17 +50,14 @@ function build
   for mod in (cat pynsh.mod)
     cat fish_libs/libs/$mod >> $build_output
   end
-  for dir_test in (ls fish_libs/apps/)
-    if test -d fish_libs/apps/$dir_test
-      set -g mws_flag true
+  for dir_select in (ls fish_libs/apps/)
+    if test -d fish_libs/apps/$dir_select
+      cat fish_libs/apps/$dir_select/** >> $build_output
+    else
+      cat fish_libs/apps/$dir_select >> $build_output
     end
   end
-  if [ "$mws_flag" = "true" ]
-    cat fish_libs/apps/* >> $build_output 2>/dev/null
-    cat fish_libs/apps/*/** >> $build_output
-  else
-    cat fish_libs/apps/* >> $build_output
-  end
+
   cat fish_libs/main.fish >> $build_output
   echo "#build time UTC = $build_time" >> $build_output
   chmod +x $build_output
@@ -138,16 +135,16 @@ set_color green
 echo "[Progynosh]Installed"
 set_color normal
 end
+function push -d "auto gitpush"
+git add .
+git commit -m (date +"%Y-%m-%d_%T" -u)
+git push
+end
 function uninstall
   sudo rm /usr/bin/progynosh
   set_color green
   echo "[Progynosh]Removed"
   set_color normal
-end
-function push -d "auto gitpush"
-git add .
-git commit -m (date +"%Y-%m-%d_%T" -u)
-git push
 end
 set_color cyan
 echo "[Progynosh]progynosh fish shell script dev manager | by tsingkwai@protonmail.com (tsingkwai.ruzhtw.top)"
@@ -168,4 +165,4 @@ case push
 case h help '*'
   help_echo
 end
-#build time UTC = 2021-11-06_04:27:57
+#build time UTC = 2021-11-12_13:07:42

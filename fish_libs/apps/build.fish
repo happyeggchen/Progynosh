@@ -23,17 +23,14 @@ function build
   for mod in (cat pynsh.mod)
     cat fish_libs/libs/$mod >> $build_output
   end
-  for dir_test in (ls fish_libs/apps/)
-    if test -d fish_libs/apps/$dir_test
-      set -g mws_flag true
+  for dir_select in (ls fish_libs/apps/)
+    if test -d fish_libs/apps/$dir_select
+      cat fish_libs/apps/$dir_select/** >> $build_output
+    else
+      cat fish_libs/apps/$dir_select >> $build_output
     end
   end
-  if [ "$mws_flag" = "true" ]
-    cat fish_libs/apps/* >> $build_output 2>/dev/null
-    cat fish_libs/apps/*/** >> $build_output
-  else
-    cat fish_libs/apps/* >> $build_output
-  end
+
   cat fish_libs/main.fish >> $build_output
   echo "#build time UTC = $build_time" >> $build_output
   chmod +x $build_output
