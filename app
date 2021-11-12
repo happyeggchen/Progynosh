@@ -1,0 +1,195 @@
+#!/usr/bin/env fish
+function checkdependence
+  if test -e $argv
+    echo -e "\033[32m[checkdependence]check passed - $argv exist\033[0m"
+  else
+    echo -e "\033[0;31m[checkdependence]check failed - plz install $argv\033[0m"
+    exit
+  end
+end
+function checknetwork
+  if curl -s -L $argv[1] | grep -q $argv[2]
+    echo -e "\033[32m[checknetwork]check passed - u`ve connected to $argv[1]\033[0m"
+  else
+    echo -e "\033[0;31m[checknetwork]check failed - check your network connection\033[0m"
+  end
+end
+function dir_exist
+  if test -d $argv[1]
+    echo -e "\033[32m[checkdir]check passed - dir $argv[1] exist\033[0m"
+  else
+    echo -e "\033[0;31m[checkdir]check failed - dir $argv[1] doesn't exist,going to makr one\033[0m"
+    mkdir $argv[1]
+  end
+end
+function list_menu
+ls $argv | sed '\~//~d'
+end
+function build
+  set -g build_time (date +"%Y-%m-%d_%T" -u)
+  set -g build_output $argv[1]
+  if [ "$argv[1]" = "" ]
+    set -g build_output app
+  end
+  function app_fish_empty
+    if test -e $build_output
+      set_color red
+        echo "[Progynosh]A file this name existed,delete it anyway?[y/n]"
+      set_color normal
+      read -P "[Progynosh] >>> " _delete_var_
+      switch $_delete_var_
+      case y
+        rm $build_output
+      case n '*'
+        echo "[Progynosh]Aborted"
+	      exit
+      end
+    end
+  end
+  app_fish_empty
+  for mod in (cat pynsh.mod)
+    cat fish_libs/libs/$mod >> $build_output
+  end
+  for dir_select in (ls fish_libs/apps/)
+    if test -d fish_libs/apps/$dir_select
+      cat fish_libs/apps/$dir_select/** >> $build_output
+    else
+      cat fish_libs/apps/$dir_select >> $build_output
+    end
+  end
+  echo "echo build_time: $build_time" >> $build_output
+  cat fish_libs/main.fish >> $build_output
+  chmod +x $build_output
+  set -e build_output
+  set_color green
+  echo "[Progynosh]Built"
+  set_color normal
+end
+function init-files -d "write essential content to structure files"
+echo "header" > pynsh.mod
+echo "#!/usr/bin/env fish" > fish_libs/libs/header
+echo "'Copyright <YEAR> <COPYRIGHT HOLDER>
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.'" > LICENSE
+echo "A progynosh fish script doc
+===========================
+This is a script dev manager for fish script shell
+>>>>> How To <<<<<
+	1 >	write your script as functions in fish_libs/apps
+	2 >	call them from fish_libs/main.fish
+	3 >	use progynosh build to build a final fish script" > handbook.md
+echo "function checkdependence
+  if test -e \$argv
+    echo -e \"\033[32m[checkdependence]check passed - \$argv exist\033[0m\"
+  else
+    echo -e \"\033[0;31m[checkdependence]check failed - plz install \$argv\033[0m\"
+    exit
+  end
+end
+function checknetwork
+  if curl -s -L \$argv[1] | grep -q \$argv[2]
+    echo -e \"\033[32m[checknetwork]check passed - u`ve connected to \$argv[1]\033[0m\"
+  else
+    echo -e \"\033[0;31m[checknetwork]check failed - check your network connection\033[0m\"
+  end
+end
+function dir_exist
+  if test -d \$argv[1]
+    echo -e \"\033[32m[checkdir]check passed - dir \$argv[1] exist\033[0m\"
+  else
+    echo -e \"\033[0;31m[checkdir]check failed - dir \$argv[1] doesn't exist,going to makr one\033[0m\"
+    mkdir \$argv[1]
+  end
+end
+function list_menu
+ls \$argv | sed '\~//~d'
+end" > fish_libs/libs/base
+end
+function init
+    mkdir -p fish_libs/apps
+    mkdir -p fish_libs/libs
+    init-files
+    echo "[Progynosh]Deployed"
+    set_color normal
+end
+function get -d "get libs from online repo"
+  set -g modulename $argv[1]
+  if [ "$argv[1]" = "" ]
+    set_color red
+    echo "[progynosh]Unexpect input"
+    set_color normal
+    exit
+  end
+  cd fish_libs/libs
+  wget "https://github.com/happyeggchen/progynosh-script-source/raw/main/$modulename/$modulename"
+  set_color cyan
+  echo "[progynosh]Processed"
+  set_color normal
+end
+function help_echo
+  set_color cyan
+  echo "Progynosh fish script build system | RuzhTaiWan [R] 2017-2021"
+  set_color normal
+  echo "==========Help Documentation=========="
+  set_color green
+  echo "(./)progynosh argv[1]"
+  set_color normal
+  echo " -argv[1]:the command to execute"
+  echo "  -Available:
+             install >>> install to /usr/bin
+             uninstall >>> remove from /usr/bin
+             init >>> Download and deploy the core file and structure for pynsh
+             build argv[2] >>> Combine the progynosh script file to one fish shell script
+              -argv[2] : Set the name of output file
+             get argv[2] >>> get libs from online repo
+              -argv[2] : Name of the libs , view the list on github.com/happyeggchen/progynosh-script-source
+             push :do a auto git push"
+  set_color yellow
+  echo "Remember,do this in the project dir,otherwish your root dir will full of pynsh files"
+  set_color normal
+  echo "========================================"
+end
+function install
+set dir (realpath (dirname (status -f)))
+set filename (status --current-filename)
+chmod +x $dir/$filename
+sudo cp $dir/$filename /usr/bin/progynosh
+set_color green
+echo "[Progynosh]Installed"
+set_color normal
+end
+function push -d "auto gitpush"
+git add .
+git commit -m (date +"%Y-%m-%d_%T" -u)
+git push
+end
+function uninstall
+  sudo rm /usr/bin/progynosh
+  set_color green
+  echo "[Progynosh]Removed"
+  set_color normal
+end
+set_color cyan
+echo "[Progynosh]progynosh fish shell script dev manager | by tsingkwai@protonmail.com (tsingkwai.ruzhtw.top)"
+set_color normal
+switch $argv[1]
+case install
+  install
+case uninstall
+  uninstall
+case init
+  init
+case build
+  build $argv[2]
+case get
+  get $argv[2]
+case push
+  push
+case h help '*'
+  help_echo
+end
+#build time UTC = 2021-11-12_13:27:16

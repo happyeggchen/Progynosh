@@ -9,7 +9,7 @@ function build
       set_color red
         echo "[Progynosh]A file this name existed,delete it anyway?[y/n]"
       set_color normal
-      read -P "[Progynosh] >>>" _delete_var_
+      read -P "[Progynosh] >>> " _delete_var_
       switch $_delete_var_
       case y
         rm $build_output
@@ -30,9 +30,8 @@ function build
       cat fish_libs/apps/$dir_select >> $build_output
     end
   end
-
+  echo "echo build_time: $build_time" >> $build_output
   cat fish_libs/main.fish >> $build_output
-  echo "#build time UTC = $build_time" >> $build_output
   chmod +x $build_output
   set -e build_output
   set_color green
