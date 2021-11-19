@@ -41,4 +41,5 @@ end
 function list_menu
 ls \$argv | sed '\~//~d'
 end" > fish_libs/libs/base
+touch fish_libs/main.fish
 end

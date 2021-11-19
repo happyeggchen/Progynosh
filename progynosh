@@ -114,6 +114,7 @@ end
 function list_menu
 ls \$argv | sed '\~//~d'
 end" > fish_libs/libs/base
+touch fish_libs/main.fish
 end
 function init
     mkdir -p fish_libs/apps
@@ -177,7 +178,7 @@ function uninstall
   set_color normal
 end
 set_color yellow
-echo Build_Time_UTC=2021-11-12_14:27:22
+echo Build_Time_UTC=2021-11-19_10:46:55
 set_color normal
 set_color cyan
 echo "[Progynosh]progynosh fish shell script dev manager | by tsingkwai@protonmail.com (tsingkwai.ruzhtw.top)"
