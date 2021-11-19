@@ -13,7 +13,7 @@ case build
 case get
   get $argv[2]
 case push
-  push
+  push $argv[2]
 case h help '*'
   help_echo
 end
