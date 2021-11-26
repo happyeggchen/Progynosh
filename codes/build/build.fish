@@ -21,7 +21,7 @@ function build
       set_color red
         echo "$prefix A file this name existed,delete it anyway?[y/n]"
       set_color normal
-      read -P "$prefix  >>> " _delete_var_
+      read -P "$prefix >>> " _delete_var_
       switch $_delete_var_
       case y
         rm $build_output
