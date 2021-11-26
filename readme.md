@@ -7,7 +7,7 @@ A progynosh fish script doc
 ##### How to write code using this
 ```
 1 >	write your script as functions in fish_libs/apps(support workspace (crafttable) likes fish_libs/apps/xxxx,but you can't embed one crafttable in another crafttable,likes fish_libs/apps/xxxx/xxxx)
-2 >	call them from fish_libs/main.fish
+2 >	call them from configs/main.fish
 3 >	use progynosh build to build a final fish script
 ```
 ##### How to view all progynosh sub-command

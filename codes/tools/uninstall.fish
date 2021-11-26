@@ -1,6 +1,6 @@
 function uninstall
   sudo rm /usr/bin/progynosh
   set_color green
-  echo "[Progynosh]Removed"
+  echo "$prefix Removed"
   set_color normal
 end

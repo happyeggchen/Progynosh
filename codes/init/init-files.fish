@@ -1,20 +1,18 @@
 function init-files -d "write essential content to structure files"
-echo "header" > pynsh.mod
-echo "#!/usr/bin/env fish" > fish_libs/libs/header
-echo "'Copyright <YEAR> <COPYRIGHT HOLDER>
-
+set resource_dir $argv[1]
+echo "header" > $resource_dir/configs/pynsh.mod
+echo "#!/usr/bin/env fish" > $resource_dir/libs/header
+echo "'MIT LICENSE
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
-
 The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.'" > LICENSE
+THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.'" > $resource_dir/docs/LICENSE
 echo "A progynosh fish script doc
 ===========================
 This is a script dev manager for fish script shell
 >>>>> How To <<<<<
-	1 >	write your script as functions in fish_libs/apps
-	2 >	call them from fish_libs/main.fish
-	3 >	use progynosh build to build a final fish script" > handbook.md
+	1 >	write your script as functions in \$resource_dir/apps
+	2 >	call them from \$resource_dir/main.fish
+	3 >	use progynosh build to build a final fish script" > $resource_dir/docs/handbook.md
 echo "function checkdependence
   if test -e \$argv
     echo -e \"\033[32m[checkdependence]check passed - \$argv exist\033[0m\"
@@ -40,6 +38,7 @@ function dir_exist
 end
 function list_menu
 ls \$argv | sed '\~//~d'
-end" > fish_libs/libs/base
-touch fish_libs/main.fish
+end" > $resource_dir/libs/base
+touch $resource_dir/configs/main.fish
+echo "cloudgirl" > $resource_dir/configs/version.lock
 end
