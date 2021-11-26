@@ -12,8 +12,9 @@ function build
     echo "$prefix Building from $resource_dir/"
   else
     set_color red
-      echo "$prefix No such resource folder found,abort"
-      exit
+      echo "$prefix No such resource folder found,process the argv as the output name,building from $resource_dir/"
+      set -g build_output $resource_dir
+      set -g resource_dir .
   end
   function app_fish_empty
     if test -e $build_output
