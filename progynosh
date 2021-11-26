@@ -182,7 +182,7 @@ function get -d "get libs from online repo"
     set_color normal
     exit
   end
-  cd fish_libs/libs
+  cd libs
   wget "https://github.com/happyeggchen/progynosh-script-source/raw/main/$modulename/$modulename"
   set_color cyan
   echo "$prefix Processed"
@@ -248,7 +248,7 @@ function candlelight2cloudgirl -d "update the folder structure"
     echo "$prefix Done,your project had been rebased"
     set_color normal
 end
-echo Build_Time_UTC=2021-11-26_13:14:39
+echo Build_Time_UTC=2021-11-26_13:21:21
 set prefix "[Progynosh]"
 set_color cyan
 echo "$prefix progynosh fish shell script dev manager | by tsingkwai@protonmail.com (tsingkwai.ruzhtw.top)"
