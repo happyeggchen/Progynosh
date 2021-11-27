@@ -18,12 +18,15 @@ function help_echo
              get argv[2] >>> get libs from online repo
               -argv[2] : Name of the libs , view the list on github.com/happyeggchen/progynosh-script-source
 
+             list argv[2] >>> listed installed libs
+             -argv[2] : the resource folder,default is the folder currently in
+
              push argv[2] >>> do a auto git push
               -argv[2] : comments you want to commit,remember to use a \'\'
 
-            transfer argv[2] argv[3] >>> rebase your project to a newer progynosh version
+             transfer argv[2] argv[3] >>> rebase your project to a newer progynosh version
               -argv[2] : version you want to transfer
-                -Available : (1) candlelight -> cloudgirl (just set the argv[2] as "1")               
+                -Available : (1) candlelight -> cloudgirl (just set the argv[2] as "1")
               -argv[3] : the project folder you want to trans,default is the folder currently in
 
             version >>> show the version of progynosh"

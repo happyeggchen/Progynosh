@@ -45,12 +45,15 @@ function help_echo
              get argv[2] >>> get libs from online repo
               -argv[2] : Name of the libs , view the list on github.com/happyeggchen/progynosh-script-source
 
+             list argv[2] >>> listed installed libs
+             -argv[2] : the resource folder,default is the folder currently in
+
              push argv[2] >>> do a auto git push
               -argv[2] : comments you want to commit,remember to use a \'\'
 
-            transfer argv[2] argv[3] >>> rebase your project to a newer progynosh version
+             transfer argv[2] argv[3] >>> rebase your project to a newer progynosh version
               -argv[2] : version you want to transfer
-                -Available : (1) candlelight -> cloudgirl (just set the argv[2] as "1")               
+                -Available : (1) candlelight -> cloudgirl (just set the argv[2] as "1")
               -argv[3] : the project folder you want to trans,default is the folder currently in
 
             version >>> show the version of progynosh"
@@ -58,6 +61,22 @@ function help_echo
   echo "Remember,do this in the project dir,otherwish your root dir will full of pynsh files"
   set_color normal
   echo "========================================"
+end
+set installname $argv[1]
+function install
+  set dir (realpath (dirname (status -f)))
+  set filename (status --current-filename)
+  chmod +x $dir/$filename
+  sudo cp $dir/$filename /usr/bin/$installname
+  set_color green
+  echo "$prefix Installed"
+  set_color normal
+end
+function uninstall
+  sudo rm /usr/bin/$installname
+  set_color green
+  echo "$prefix Removed"
+  set_color normal
 end
 function build
   set -g build_time (date +"%Y-%m-%d_%T" -u)
@@ -183,19 +202,22 @@ function get -d "get libs from online repo"
     exit
   end
   cd libs
-  wget "https://github.com/happyeggchen/progynosh-script-source/raw/main/$modulename/$modulename"
-  set_color cyan
-  echo "$prefix Processed"
+  if curl -o $modulename -s -L "https://github.com/happyeggchen/progynosh-script-source/raw/main/$modulename/$modulename"
+  set_color green
+  echo "$prefix Processed and succeeded"
   set_color normal
+  else
+  set_color red
+  echo "$prefix failed"
+  set_color normal
+  end
 end
-function install
-set dir (realpath (dirname (status -f)))
-set filename (status --current-filename)
-chmod +x $dir/$filename
-sudo cp $dir/$filename /usr/bin/progynosh
-set_color green
-echo "$prefix Installed"
-set_color normal
+function list -d "list mods"
+set -g resource_dir $argv[1]
+  if [ "$argv[1]" = "" ]
+    set -g resource_dir .
+  end
+ls $resource_dir/libs | sed '\~//~d'
 end
 function push -d "auto gitpush"
 if [ "$argv[1]" = "" ]
@@ -206,12 +228,6 @@ end
 git add .
 git commit -m $commit_msg
 git push
-end
-function uninstall
-  sudo rm /usr/bin/progynosh
-  set_color green
-  echo "$prefix Removed"
-  set_color normal
 end
 function candlelight2cloudgirl -d "update the folder structure"
   set resource_dir $argv[1]
@@ -248,16 +264,16 @@ function candlelight2cloudgirl -d "update the folder structure"
     echo "$prefix Done,your project had been rebased"
     set_color normal
 end
-echo Build_Time_UTC=2021-11-26_14:22:59
+echo Build_Time_UTC=2021-11-27_04:06:07
 set prefix "[Progynosh]"
 set_color cyan
 echo "$prefix progynosh fish shell script dev manager | by tsingkwai@protonmail.com (tsingkwai.ruzhtw.top)"
 set_color normal
 switch $argv[1]
 case install
-  install
+  install progynosh
 case uninstall
-  uninstall
+  uninstall progynosh
 case init
   init $argv[2]
 case build
