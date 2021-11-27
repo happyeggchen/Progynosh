@@ -48,6 +48,10 @@ function help_echo
              list argv[2] >>> listed installed libs
              -argv[2] : the resource folder,default is the folder currently in
 
+             remove argv[2] argv[3] >>> remove mods from libs
+              -argv[2] : the resource folder,default is the folder currently in
+              -argv[3] : the name of mods
+
              push argv[2] >>> do a auto git push
               -argv[2] : comments you want to commit,remember to use a \'\'
 
@@ -57,13 +61,10 @@ function help_echo
               -argv[3] : the project folder you want to trans,default is the folder currently in
 
             version >>> show the version of progynosh"
-  set_color yellow
-  echo "Remember,do this in the project dir,otherwish your root dir will full of pynsh files"
-  set_color normal
   echo "========================================"
 end
-set installname $argv[1]
 function install
+set installname $argv[1]
   set dir (realpath (dirname (status -f)))
   set filename (status --current-filename)
   chmod +x $dir/$filename
@@ -73,45 +74,43 @@ function install
   set_color normal
 end
 function uninstall
+set installname $argv[1]
   sudo rm /usr/bin/$installname
   set_color green
   echo "$prefix Removed"
   set_color normal
 end
 function build
-  set -g build_time (date +"%Y-%m-%d_%T" -u)
-  set -g resource_dir $argv[1]
-  set -g build_output $argv[2]
+  set build_time (date +"%Y-%m-%d_%T" -u)
+  set resource_dir $argv[1]
+  set build_output $argv[2]
   if [ "$argv[1]" = "" ]
-    set -g resource_dir .
+    set resource_dir .
   end
   if [ "$argv[2]" = "" ]
-    set -g build_output app
+    set build_output app
   end
   if test -d $resource_dir
     echo "$prefix Building from $resource_dir/"
   else
     set_color red
       echo "$prefix No such resource folder found,process the argv as the output name,building from $resource_dir/"
-      set -g build_output $resource_dir
-      set -g resource_dir .
+      set build_output $resource_dir
+      set resource_dir .
   end
-  function app_fish_empty
-    if test -e $build_output
-      set_color red
-        echo "$prefix A file this name existed,delete it anyway?[y/n]"
-      set_color normal
-      read -P "$prefix >>> " _delete_var_
-      switch $_delete_var_
-      case y
-        rm $build_output
-      case n '*'
-        echo "$prefix Aborted"
-	      exit
-      end
-    end
+  if test -e $build_output
+    set_color red
+      echo "$prefix A file this name existed,delete it anyway?[y/n]"
+    set_color normal
+    read -P "$prefix >>> " _delete_var_
+    switch $_delete_var_
+    case y
+      rm $build_output
+    case n '*'
+      echo "$prefix Aborted"
+	    exit
   end
-  app_fish_empty
+  end
   for mod in (cat $resource_dir/configs/pynsh.mod)
     cat $resource_dir/libs/$mod >> $build_output
   end
@@ -129,8 +128,6 @@ function build
   echo "echo Build_Time_UTC=$build_time" >> $build_output
   cat $resource_dir/configs/main.fish >> $build_output
   chmod +x $build_output
-  set -e build_output
-  set -e resource_dir
   set_color green
   echo "$prefix Built"
   set_color normal
@@ -229,6 +226,36 @@ git add .
 git commit -m $commit_msg
 git push
 end
+function remove -d "remove a mod from libs"
+  set resource_dir $argv[1]
+  set mod $argv[2]
+  if [ "$argv[1]" = "" ]
+    set resource_dir .
+  end
+  if test -d $resource_dir
+    echo "$prefix removing libs from $resource_dir/libs"
+  else
+    set_color red
+      echo "$prefix No such resource folder found,process the argv[3] as the mod name"
+      set mod $resource_dir
+      set resource_dir .
+  end
+  if test -e $resource_dir/libs/$mod
+    if rm $resource_dir/libs/$mod
+      set_color green
+      echo "$prefix removed"
+      set_color normal
+    else
+      set_color red
+      echo "$prefix can't remove $mod,abort"
+      set_color normal
+    end
+  else
+    set_color red
+    echo "$prefix Nothing to remove,abort"
+    set_color normal
+  end
+end
 function candlelight2cloudgirl -d "update the folder structure"
   set resource_dir $argv[1]
   if [ "$argv[1]" = "" ]
@@ -264,7 +291,7 @@ function candlelight2cloudgirl -d "update the folder structure"
     echo "$prefix Done,your project had been rebased"
     set_color normal
 end
-echo Build_Time_UTC=2021-11-27_04:06:07
+echo Build_Time_UTC=2021-11-27_04:24:48
 set prefix "[Progynosh]"
 set_color cyan
 echo "$prefix progynosh fish shell script dev manager | by tsingkwai@protonmail.com (tsingkwai.ruzhtw.top)"
@@ -280,6 +307,10 @@ case build
   build $argv[2] $argv[3]
 case get
   get $argv[2]
+case list
+  list $argv[2]
+case remove
+  remove $argv[2] $argv[3]
 case push
   push $argv[2]
 case transfer

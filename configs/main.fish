@@ -13,6 +13,10 @@ case build
   build $argv[2] $argv[3]
 case get
   get $argv[2]
+case list
+  list $argv[2]
+case remove
+  remove $argv[2] $argv[3]
 case push
   push $argv[2]
 case transfer

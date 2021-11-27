@@ -1,5 +1,5 @@
-set installname $argv[1]
 function install
+set installname $argv[1]
   set dir (realpath (dirname (status -f)))
   set filename (status --current-filename)
   chmod +x $dir/$filename
@@ -9,6 +9,7 @@ function install
   set_color normal
 end
 function uninstall
+set installname $argv[1]
   sudo rm /usr/bin/$installname
   set_color green
   echo "$prefix Removed"
