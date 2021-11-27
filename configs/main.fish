@@ -4,9 +4,9 @@ echo "$prefix progynosh fish shell script dev manager | by tsingkwai@protonmail.
 set_color normal
 switch $argv[1]
 case install
-  install
+  install progynosh
 case uninstall
-  uninstall
+  uninstall progynosh
 case init
   init $argv[2]
 case build

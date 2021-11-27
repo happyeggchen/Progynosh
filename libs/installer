@@ -1,0 +1,16 @@
+set installname $argv[1]
+function install
+  set dir (realpath (dirname (status -f)))
+  set filename (status --current-filename)
+  chmod +x $dir/$filename
+  sudo cp $dir/$filename /usr/bin/$installname
+  set_color green
+  echo "$prefix Installed"
+  set_color normal
+end
+function uninstall
+  sudo rm /usr/bin/$installname
+  set_color green
+  echo "$prefix Removed"
+  set_color normal
+end
