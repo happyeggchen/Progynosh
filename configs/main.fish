@@ -30,7 +30,8 @@ case transfer
   end
 case v version
   set_color yellow
-  echo "CloudGirl v1.1"
+  echo "CloudGirl v2.3"
+  set_color normal
 case h help '*'
   help_echo
 end
