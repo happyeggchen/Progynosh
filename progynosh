@@ -102,11 +102,11 @@ function build
     set_color red
       echo "$prefix A file this name existed,delete it anyway?[y/n]"
     set_color normal
-    read -P "$prefix >>> " _delete_var_
+    read -n1 -P "$prefix >>> " _delete_var_
     switch $_delete_var_
-    case y
+    case Y y
       rm $build_output
-    case n '*'
+    case N n '*'
       echo "$prefix Aborted"
 	    exit
   end
@@ -291,7 +291,7 @@ function candlelight2cloudgirl -d "update the folder structure"
     echo "$prefix Done,your project had been rebased"
     set_color normal
 end
-echo Build_Time_UTC=2021-11-27_04:26:56
+echo Build_Time_UTC=2021-11-28_04:06:32
 set prefix "[Progynosh]"
 set_color cyan
 echo "$prefix progynosh fish shell script dev manager | by tsingkwai@protonmail.com (tsingkwai.ruzhtw.top)"
@@ -324,7 +324,7 @@ case transfer
   end
 case v version
   set_color yellow
-  echo "CloudGirl v2.3"
+  echo "CloudGirl v2.3.2"
   set_color normal
 case h help '*'
   help_echo
