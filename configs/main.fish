@@ -11,6 +11,8 @@ case init
   init $argv[2]
 case build
   build $argv[2] $argv[3]
+case bundle
+  bundle $argv[2] $argv[3] $argv[4] $argv[5]
 case get
   get $argv[2]
 case list
@@ -23,14 +25,16 @@ case transfer
   switch $argv[2]
   case 1
     candlelight2cloudgirl $argv[3]
+  case 2
+    candlelight2frostflower $argv[3]
   case h help '*'
     set_color red
-    echo "$prefix Unexpected input"
+    echo "$prefix Unexpected input in [app.progynosh.transfer.MainActivity]{$argv[1]}"
     set_color normal
   end
 case v version
   set_color yellow
-  echo "CloudGirl v2.3.2"
+  echo "FrostFlower@build1"
   set_color normal
 case h help '*'
   help_echo
