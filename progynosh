@@ -41,7 +41,7 @@ function help_echo
              bundle argv[2] >>> merge the script with a binary file
               -argv[2] : guider
                 -Available :tui,cui
-                
+
              build argv[2] argv[3] >>> Combine the progynosh script file to one fish shell script
               -argv[2] : the resource folder,default is the folder currently in
               -argv[3] : Set the name of output file,default is ./app
@@ -57,11 +57,12 @@ function help_echo
               -argv[3] : the name of mods
 
              push argv[2] >>> do a auto git push
-              -argv[2] : comments you want to commit,remember to use a \'\'
+              -argv[2] : comments you want to commit,remember to use a ''
 
              transfer argv[2] argv[3] >>> rebase your project to a newer progynosh version
               -argv[2] : version you want to transfer
                 -Available : (1) candlelight -> cloudgirl (just set the argv[2] as "1")
+                             (2) candlelight -> FrostFlower (just set the argv[2] as "2")
               -argv[3] : the project folder you want to trans,default is the folder currently in
 
             version >>> show the version of progynosh"
@@ -491,7 +492,42 @@ function candlelight2cloudgirl -d "update the folder structure"
     echo "$prefix Done,your project had been rebased"
     set_color normal
 end
-echo Build_Time_UTC=2021-12-04_09:06:16
+function candlelight2frostflower -d "update the folder structure"
+  set resource_dir $argv[1]
+  if [ "$argv[1]" = "" ]
+    set resource_dir '.'
+  end
+  set_color yellow
+  echo "$prefix Rebasing the folder structure"
+  set_color normal
+    dir_exist $resource_dir/configs
+    dir_exist $resource_dir/docs
+    if test -d $resource_dir/fish_libs
+      if test -d $resource_dir/fish_libs/apps
+        echo "$prefix Found old codes folder,moving to new one"
+        mv $resource_dir/fish_libs/apps $resource_dir/codes
+      end
+      if test -d $resource_dir/fish_libs/libs
+        echo "$prefix Found old libraries folder,moving to new one"
+        mv $resource_dir/fish_libs/libs $resource_dir/libs
+      end
+      if test -e $resource_dir/fish_libs/main.fish
+        echo "$prefix Found old main.fish caller,moving to new one"
+        mv $resource_dir/fish_libs/main.fish $resource_dir/configs/main.fish
+      end
+      mv $resource_dir/fish_libs $resource_dir/rebased-trash-bin
+    end
+    if test -e $resource_dir/pynsh.mod
+      echo "$prefix Found old libraries declear files,moving to new one"
+      mv $resource_dir/pynsh.mod $resource_dir/configs/pynsh.mod
+    end
+    dir_exist $resource_dir/codes
+    dir_exist $resource_dir/libs
+    set_color green
+    echo "$prefix Done,your project had been rebased"
+    set_color normal
+end
+echo Build_Time_UTC=2021-12-04_09:09:31
 set prefix "[Progynosh]"
 set_color cyan
 echo "$prefix progynosh fish shell script dev manager | by tsingkwai@protonmail.com (tsingkwai.ruzhtw.top)"
@@ -519,6 +555,8 @@ case transfer
   switch $argv[2]
   case 1
     candlelight2cloudgirl $argv[3]
+  case 2
+    candlelight2frostflower $argv[3]
   case h help '*'
     set_color red
     echo "$prefix Unexpected input in [app.progynosh.transfer.MainActivity]{$argv[1]}"

@@ -25,6 +25,8 @@ case transfer
   switch $argv[2]
   case 1
     candlelight2cloudgirl $argv[3]
+  case 2
+    candlelight2frostflower $argv[3]
   case h help '*'
     set_color red
     echo "$prefix Unexpected input in [app.progynosh.transfer.MainActivity]{$argv[1]}"
