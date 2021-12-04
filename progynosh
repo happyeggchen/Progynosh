@@ -491,7 +491,7 @@ function candlelight2cloudgirl -d "update the folder structure"
     echo "$prefix Done,your project had been rebased"
     set_color normal
 end
-echo Build_Time_UTC=2021-12-04_09:03:20
+echo Build_Time_UTC=2021-12-04_09:06:16
 set prefix "[Progynosh]"
 set_color cyan
 echo "$prefix progynosh fish shell script dev manager | by tsingkwai@protonmail.com (tsingkwai.ruzhtw.top)"
@@ -526,7 +526,7 @@ case transfer
   end
 case v version
   set_color yellow
-  echo "CloudGirl v2.3.2"
+  echo "FrostFlower@build1"
   set_color normal
 case h help '*'
   help_echo
