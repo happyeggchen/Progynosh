@@ -27,7 +27,7 @@ function build
     case N n '*'
       echo "$prefix Aborted"
 	    exit
-  end
+    end
   end
   for mod in (cat $resource_dir/configs/pynsh.mod)
     cat $resource_dir/libs/$mod >> $build_output

@@ -11,6 +11,10 @@ function help_echo
              init argv[2] >>> deploy the core files and structure for pynsh
               -argv[2] : the name of resource folder,default is the folder currently in
 
+             bundle argv[2] >>> merge the script with a binary file
+              -argv[2] : guider
+                -Available :tui,cui
+                
              build argv[2] argv[3] >>> Combine the progynosh script file to one fish shell script
               -argv[2] : the resource folder,default is the folder currently in
               -argv[3] : Set the name of output file,default is ./app

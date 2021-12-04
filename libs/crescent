@@ -1,0 +1,84 @@
+function crescent-choose -d "draw a tui for choosing"
+crescent-backend
+set crescent_title $argv[1]
+set crescent_title_menu $argv[2]
+set crescent_menu_list $argv[3..-1]
+if [ "$argv[1]" = "" ]
+  set crescent_title crescent_title
+end
+if [ "$argv[2]" = "" ]
+  set crescent_title_menu crescent_title_menu
+end
+set crescent_output ($crescent_backend --title $crescent_title --menu $crescent_title_menu 0 0 0 $crescent_menu_list 3>&1 1>&2 2>&3 3>&-)
+echo $crescent_output
+end
+function crescent-gauge -d "progress bar"
+crescent-backend
+set crescent_title $argv[1]
+set crescent_title_gauge $argv[2]
+set crescent_gauge_percent $argv[3]
+  if [ "$argv[1]" = "" ]
+    set crescent_title crescent_title
+  end
+  if [ "$argv[2]" = "" ]
+    set crescent_title_gauge crescent_title_gauge
+  end
+  if [ "$argv[3]" = "" ]
+    set crescent_gauge_percent 0
+  end
+  echo $crescent_gauge_percent | $crescent_backend --title $crescent_title --gauge $crescent_title_gauge 0 0 0
+end
+function crescent-input -d "input box"
+crescent-backend
+set crescent_title $argv[1]
+set crescent_title_input $argv[2]
+set crescent_text_init $argv[3]
+  if [ "$argv[1]" = "" ]
+    set crescent_title crescent_title
+  end
+  if [ "$argv[2]" = "" ]
+    set crescent_title_input crescent_title_input
+  end
+set crescent_output ($crescent_backend --title $crescent_title --inputbox $crescent_title_input 0 0 $crescent_text_init 3>&1 1>&2 2>&3 3>&-)
+echo $crescent_output
+end
+function crescent-inputmenu -d "draw a tui for input"
+crescent-backend
+set crescent_title $argv[1]
+set crescent_title_menu_text_input $argv[2]
+set crescent_menu_list_text $argv[3..-1]
+  if [ "$argv[1]" = "" ]
+    set crescent_title crescent_title
+  end
+  if [ "$argv[2]" = "" ]
+    set crescent_title_menu_text_input crescent_title_menu_text_input
+  end
+  set crescent_output ($crescent_backend --title $crescent_title --inputmenu $crescent_title_menu_text_input 0 0 0 $crescent_menu_list_text 3>&1 1>&2 2>&3 3>&-)
+echo $crescent_output
+end
+function crescent-backend -d "detect backend for crescent"
+  if command -q -v dialog
+    set -g crescent_backend (command -v dialog)
+  else
+    if command -v whiptail
+      set -g crescent_backend (command -v whiptail)
+    else
+    set_color red
+    set_color normal
+    end
+  end
+end
+function crescent
+switch $argv[1]
+case choose
+  crescent-choose $argv[2] $argv[3] $argv[4..-1]
+case input
+  crescent-input $argv[2] $argv[3] $argv[4]
+case inputmenu
+  crescent-inputmenu $argv[2] $argv[3] $argv[4..-1]
+case gauge
+  crescent-gauge $argv[2] $argv[3] $argv[4]
+end
+#trash collection
+set -e crescent_backend
+end

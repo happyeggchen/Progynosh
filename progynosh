@@ -38,6 +38,10 @@ function help_echo
              init argv[2] >>> deploy the core files and structure for pynsh
               -argv[2] : the name of resource folder,default is the folder currently in
 
+             bundle argv[2] >>> merge the script with a binary file
+              -argv[2] : guider
+                -Available :tui,cui
+                
              build argv[2] argv[3] >>> Combine the progynosh script file to one fish shell script
               -argv[2] : the resource folder,default is the folder currently in
               -argv[3] : Set the name of output file,default is ./app
@@ -80,6 +84,90 @@ set installname $argv[1]
   echo "$prefix Removed"
   set_color normal
 end
+function crescent-choose -d "draw a tui for choosing"
+crescent-backend
+set crescent_title $argv[1]
+set crescent_title_menu $argv[2]
+set crescent_menu_list $argv[3..-1]
+if [ "$argv[1]" = "" ]
+  set crescent_title crescent_title
+end
+if [ "$argv[2]" = "" ]
+  set crescent_title_menu crescent_title_menu
+end
+set crescent_output ($crescent_backend --title $crescent_title --menu $crescent_title_menu 0 0 0 $crescent_menu_list 3>&1 1>&2 2>&3 3>&-)
+echo $crescent_output
+end
+function crescent-gauge -d "progress bar"
+crescent-backend
+set crescent_title $argv[1]
+set crescent_title_gauge $argv[2]
+set crescent_gauge_percent $argv[3]
+  if [ "$argv[1]" = "" ]
+    set crescent_title crescent_title
+  end
+  if [ "$argv[2]" = "" ]
+    set crescent_title_gauge crescent_title_gauge
+  end
+  if [ "$argv[3]" = "" ]
+    set crescent_gauge_percent 0
+  end
+  echo $crescent_gauge_percent | $crescent_backend --title $crescent_title --gauge $crescent_title_gauge 0 0 0
+end
+function crescent-input -d "input box"
+crescent-backend
+set crescent_title $argv[1]
+set crescent_title_input $argv[2]
+set crescent_text_init $argv[3]
+  if [ "$argv[1]" = "" ]
+    set crescent_title crescent_title
+  end
+  if [ "$argv[2]" = "" ]
+    set crescent_title_input crescent_title_input
+  end
+set crescent_output ($crescent_backend --title $crescent_title --inputbox $crescent_title_input 0 0 $crescent_text_init 3>&1 1>&2 2>&3 3>&-)
+echo $crescent_output
+end
+function crescent-inputmenu -d "draw a tui for input"
+crescent-backend
+set crescent_title $argv[1]
+set crescent_title_menu_text_input $argv[2]
+set crescent_menu_list_text $argv[3..-1]
+  if [ "$argv[1]" = "" ]
+    set crescent_title crescent_title
+  end
+  if [ "$argv[2]" = "" ]
+    set crescent_title_menu_text_input crescent_title_menu_text_input
+  end
+  set crescent_output ($crescent_backend --title $crescent_title --inputmenu $crescent_title_menu_text_input 0 0 0 $crescent_menu_list_text 3>&1 1>&2 2>&3 3>&-)
+echo $crescent_output
+end
+function crescent-backend -d "detect backend for crescent"
+  if command -q -v dialog
+    set -g crescent_backend (command -v dialog)
+  else
+    if command -v whiptail
+      set -g crescent_backend (command -v whiptail)
+    else
+    set_color red
+    set_color normal
+    end
+  end
+end
+function crescent
+switch $argv[1]
+case choose
+  crescent-choose $argv[2] $argv[3] $argv[4..-1]
+case input
+  crescent-input $argv[2] $argv[3] $argv[4]
+case inputmenu
+  crescent-inputmenu $argv[2] $argv[3] $argv[4..-1]
+case gauge
+  crescent-gauge $argv[2] $argv[3] $argv[4]
+end
+#trash collection
+set -e crescent_backend
+end
 function build
   set build_time (date +"%Y-%m-%d_%T" -u)
   set resource_dir $argv[1]
@@ -109,7 +197,7 @@ function build
     case N n '*'
       echo "$prefix Aborted"
 	    exit
-  end
+    end
   end
   for mod in (cat $resource_dir/configs/pynsh.mod)
     cat $resource_dir/libs/$mod >> $build_output
@@ -131,6 +219,117 @@ function build
   set_color green
   echo "$prefix Built"
   set_color normal
+end
+function bundle -d "bundle data with script"
+  set bundle_mode $argv[1]
+  set resource_dir $argv[2]
+  set bundle_output $argv[3]
+  set bundle_data $argv[4]
+  if [ "$bundle_mode" = "" ]
+    set_color red
+    echo "$prefix Unexpected Input in [app.progynosh.bundle_mode],{empty}"
+    set_color normal
+    exit
+  end
+  switch $bundle_mode
+  case cui
+    echo "$prefix Where the project located?{default: ./}"
+    read -P "$prefix >>> " resource_dir
+      if [ "$resource_dir" = "" ]
+        set resource_dir .
+      end
+    echo "$prefix What name you want to give the produced file?{default: bundle_app}"
+    read -P "$prefix >>> " bundle_output
+      if [ "$bundle_output" = "" ]
+        set bundle_output bundle_app
+      end
+    echo "$prefix Where the data folder located in?{default: res}"
+    read -P "$prefix >>> " bundle_data
+      if [ "$bundle_data" = "" ]
+        set bundle_data res
+      end
+    set_color yellow
+    echo "$prefix Bundling from $resource_dir"
+    set_color normal
+    mkdir -p $resource_dir/bundle_crafttable
+    mv $resource_dir/$bundle_data $resource_dir/bundle_crafttable
+    build $resource_dir $resource_dir/bundle_crafttable/bundle_app_core
+    tar zcf bundle_data.tar.gz $resource_dir/bundle_crafttable/
+    echo "#!/usr/bin/fish
+set extract_time (date +"%Y-%m-%d_%T" -u)
+mkdir progynosh_bundle_runtime\$extract_time
+set dir (realpath (dirname (status -f)))
+set filename (status --current-filename)
+set startline (awk '/^progynosh_bundle_runtime_data_below/ {print NR + 1; exit 0; }' \$dir/\$filename)
+tail -n+\$startline \$dir/\$filename | tar zxf - -C ./progynosh_bundle_runtime\$extract_time
+cd progynosh_bundle_runtime\$extract_time/bundle_crafttable/
+./bundle_app_core
+rm -rf progynosh_bundle_runtime\$extract_time
+exit 0
+progynosh_bundle_runtime_data_below" > $resource_dir/$bundle_output
+    cat $resource_dir/bundle_data.tar.gz >> $resource_dir/$bundle_output
+    chmod +x $resource_dir/$bundle_output
+    rm -f $resource_dir/bundle_data.tar.gz
+    mv $resource_dir/bundle_crafttable/$bundle_data $resource_dir
+    rm -rf $resource_dir/bundle_crafttable
+    set_color green
+    echo "$prefix Bundled"
+    set_color normal
+  case tui
+    set resource_dir (crescent input 'Progynosh bundler' 'Where the project located?{default: ./}')
+    if [ "$resource_dir" = "" ]
+      set resource_dir .
+    end
+    set bundle_output (crescent input 'Progynosh bundler' 'What name you want to give the produced file?{default: bundle_app}')
+    if [ "$bundle_output" = "" ]
+      set bundle_output bundle_app
+    end
+    set bundle_data (crescent input 'Progynosh bundler' 'Where the data folder located in?{default: res}')
+    if [ "$bundle_data" = "" ]
+      set bundle_data res
+    end
+    set_color yellow
+    crescent gauge 'Progynosh bundler' 'Building' 0
+    set_color normal
+    mkdir -p $resource_dir/bundle_crafttable
+    crescent gauge 'Progynosh bundler' 'Building' 25
+    mv $resource_dir/$bundle_data $resource_dir/bundle_crafttable
+    build $resource_dir $resource_dir/bundle_crafttable/bundle_app_core
+    crescent gauge 'Progynosh bundler' 'Building' 50
+    tar zcf bundle_data.tar.gz $resource_dir/bundle_crafttable/*
+    echo "#!/usr/bin/fish
+set extract_time (date +"%Y-%m-%d_%T" -u)
+mkdir progynosh_bundle_runtime\$extract_time
+set dir (realpath (dirname (status -f)))
+set filename (status --current-filename)
+set startline (awk '/^progynosh_bundle_runtime_data_below/ {print NR + 1; exit 0; }' \$dir/\$filename)
+tail -n+\$startline \$dir/\$filename | tar zxf - -C ./progynosh_bundle_runtime\$extract_time
+cd progynosh_bundle_runtime\$extract_time/bundle_crafttable/
+./bundle_app_core
+rm -rf progynosh_bundle_runtime\$extract_time
+exit 0
+progynosh_bundle_runtime_data_below" > $resource_dir/$bundle_output
+crescent gauge 'Progynosh bundler' 'Building' 76
+    cat $resource_dir/bundle_data.tar.gz >> $resource_dir/$bundle_output
+    crescent gauge 'Progynosh bundler' 'Building' 85
+    chmod +x $resource_dir/$bundle_output
+    crescent gauge 'Progynosh bundler' 'Building' 91
+    rm -f $resource_dir/bundle_data.tar.gz
+    crescent gauge 'Progynosh bundler' 'Building' 95
+    mv $resource_dir/bundle_crafttable/$bundle_data $resource_dir
+    crescent gauge 'Progynosh bundler' 'Building' 98
+    rm -rf $resource_dir/bundle_crafttable
+    crescent gauge 'Progynosh bundler' 'Building' 100
+    echo
+    set_color green
+    echo "$prefix Bundled"
+    set_color normal
+  case h help '*'
+    set_color red
+    echo "$prefix Unexpected Input in [app.progynosh.bundle_mode],{$bundle_mode}"
+    set_color normal
+    exit
+  end
 end
 function init-files -d "write essential content to structure files"
 set resource_dir $argv[1]
@@ -185,6 +384,7 @@ function init
     mkdir -p $resource_dir/configs
     mkdir -p $resource_dir/docs
     mkdir -p $resource_dir/libs
+    mkdir -p $resource_dir/res
     init-files $resource_dir
     echo "$prefix Deployed"
     set_color normal
@@ -291,7 +491,7 @@ function candlelight2cloudgirl -d "update the folder structure"
     echo "$prefix Done,your project had been rebased"
     set_color normal
 end
-echo Build_Time_UTC=2021-11-28_04:06:32
+echo Build_Time_UTC=2021-12-04_09:03:20
 set prefix "[Progynosh]"
 set_color cyan
 echo "$prefix progynosh fish shell script dev manager | by tsingkwai@protonmail.com (tsingkwai.ruzhtw.top)"
@@ -305,6 +505,8 @@ case init
   init $argv[2]
 case build
   build $argv[2] $argv[3]
+case bundle
+  bundle $argv[2] $argv[3] $argv[4] $argv[5]
 case get
   get $argv[2]
 case list
@@ -319,7 +521,7 @@ case transfer
     candlelight2cloudgirl $argv[3]
   case h help '*'
     set_color red
-    echo "$prefix Unexpected input"
+    echo "$prefix Unexpected input in [app.progynosh.transfer.MainActivity]{$argv[1]}"
     set_color normal
   end
 case v version
