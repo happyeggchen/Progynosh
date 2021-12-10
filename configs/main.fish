@@ -34,7 +34,7 @@ case transfer
   end
 case v version
   set_color yellow
-  echo "FrostFlower@build1"
+  echo "FrostFlower@build2"
   set_color normal
 case h help '*'
   help_echo
