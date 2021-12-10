@@ -32,16 +32,8 @@ function build
   for mod in (cat $resource_dir/configs/pynsh.mod)
     cat $resource_dir/libs/$mod >> $build_output
   end
-  for dir_select in (ls $resource_dir/codes/)
-    if test -d $resource_dir/codes/$dir_select
-      set dir_select_empty (ls -A $resource_dir/codes/$dir_select)
-      if test -z "$dir_select_empty"
-      else
-        cat $resource_dir/codes/$dir_select/** >> $build_output
-      end
-    else
-      cat $resource_dir/codes/$dir_select >> $build_output
-    end
+  for blocks in (find $resource_dir/codes -type f | sed 's|^./||')
+    cat $resource_dir/$blocks >> $build_output
   end
   echo "echo Build_Time_UTC=$build_time" >> $build_output
   cat $resource_dir/configs/main.fish >> $build_output
