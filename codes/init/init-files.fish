@@ -40,5 +40,5 @@ function list_menu
 ls \$argv | sed '\~//~d'
 end" > $resource_dir/libs/base
 touch $resource_dir/configs/main.fish
-echo "cloudgirl" > $resource_dir/configs/version.lock
+echo "FrostFlower" > $resource_dir/configs/version.lock
 end

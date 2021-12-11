@@ -32,9 +32,11 @@ case transfer
     echo "$prefix Unexpected input in [app.progynosh.transfer.MainActivity]{$argv[1]}"
     set_color normal
   end
+case new
+  fish_new $argv[2] $argv[3]
 case v version
   set_color yellow
-  echo "FrostFlower@build2"
+  echo "FrostFlower@build3"
   set_color normal
 case h help '*'
   help_echo

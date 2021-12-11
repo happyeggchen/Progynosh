@@ -27,6 +27,7 @@ function candlelight2cloudgirl -d "update the folder structure"
       echo "$prefix Found old libraries declear files,moving to new one"
       mv $resource_dir/pynsh.mod $resource_dir/configs/pynsh.mod
     end
+    echo "CloudGirl" > $resource_dir/configs/version.lock
     dir_exist $resource_dir/codes
     dir_exist $resource_dir/libs
     set_color green
