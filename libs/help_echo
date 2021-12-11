@@ -8,6 +8,11 @@ function help_echo
              install >>> install to /usr/bin
              uninstall >>> remove from /usr/bin
 
+             new argv[2] argv[3..-1] >>> create a new fish shell script in codes
+              -argv[2] : the name of resource folder,default is the folder currently in
+              -argv[3..-1] : The new script name
+              Example : (./)progynosh new . 'activity/test/hi'
+
              init argv[2] >>> deploy the core files and structure for pynsh
               -argv[2] : the name of resource folder,default is the folder currently in
 

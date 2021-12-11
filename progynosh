@@ -35,6 +35,11 @@ function help_echo
              install >>> install to /usr/bin
              uninstall >>> remove from /usr/bin
 
+             new argv[2] argv[3..-1] >>> create a new fish shell script in codes
+              -argv[2] : the name of resource folder,default is the folder currently in
+              -argv[3..-1] : The new script name
+              Example : (./)progynosh new . 'activity/test/hi'
+
              init argv[2] >>> deploy the core files and structure for pynsh
               -argv[2] : the name of resource folder,default is the folder currently in
 
@@ -183,9 +188,9 @@ function build
     echo "$prefix Building from $resource_dir/"
   else
     set_color red
-      echo "$prefix No such resource folder found,process the argv as the output name,building from $resource_dir/"
-      set build_output $resource_dir
-      set resource_dir .
+    set build_output $resource_dir
+    set resource_dir .
+    echo "$prefix No such resource folder found,process the argv as the output name,building from $resource_dir/"
   end
   if test -e $build_output
     set_color red
@@ -255,7 +260,7 @@ function list_menu
 ls \$argv | sed '\~//~d'
 end" > $resource_dir/libs/base
 touch $resource_dir/configs/main.fish
-echo "cloudgirl" > $resource_dir/configs/version.lock
+echo "FrostFlower" > $resource_dir/configs/version.lock
 end
 function init
   set -g resource_dir $argv[1]
@@ -412,6 +417,7 @@ function candlelight2cloudgirl -d "update the folder structure"
       echo "$prefix Found old libraries declear files,moving to new one"
       mv $resource_dir/pynsh.mod $resource_dir/configs/pynsh.mod
     end
+    echo "CloudGirl" > $resource_dir/configs/version.lock
     dir_exist $resource_dir/codes
     dir_exist $resource_dir/libs
     set_color green
@@ -447,11 +453,56 @@ function candlelight2frostflower -d "update the folder structure"
       echo "$prefix Found old libraries declear files,moving to new one"
       mv $resource_dir/pynsh.mod $resource_dir/configs/pynsh.mod
     end
+    echo "FrostFlower" > $resource_dir/configs/version.lock
     dir_exist $resource_dir/codes
     dir_exist $resource_dir/libs
     set_color green
     echo "$prefix Done,your project had been rebased"
     set_color normal
+end
+function fish_new -d "create a function"
+set resource_dir $argv[1]
+set newfishscript $argv[2]
+if [ "$argv[1]" = "" ]
+  set resource_dir .
+end
+if test -d $resource_dir
+else
+  set_color red
+  set newfishscript $resource_dir
+  set resource_dir .
+  echo "$prefix No such resource folder found,process the argv as the name of new fish script,in $resource_dir/codes"
+end
+if [ "$newfishscript" = "" ]
+  set_color red
+    echo "$prefix Nothing to create,abort"
+    exit
+  set_color normal
+else
+  set newfishscriptbasename (basename $newfishscript)
+  if test -e $resource_dir/codes/$newfishscript.fish
+    set_color red
+      echo "$prefix A file this name existed,delete it anyway?[y/n]"
+    set_color normal
+    read -n1 -P "$prefix >>> " _delete_var_
+      switch $_delete_var_
+      case Y y
+        rm $resource_dir/codes/$newfishscript.fish
+      case N n '*'
+        echo "$prefix Aborted"
+  	    exit
+      end
+  end
+  if mkdir -p $resource_dir/codes/(dirname $newfishscript);printf "function $newfishscriptbasename\nend" > $resource_dir/codes/$newfishscript.fish
+    set_color green
+    echo "$prefix Processed and succeeded"
+    set_color normal
+  else
+    set_color red
+    echo "$prefix failed"
+    set_color normal
+  end
+end
 end
 function remove -d "remove a mod from libs"
   set resource_dir $argv[1]
@@ -519,7 +570,7 @@ set -g resource_dir $argv[1]
   end
 ls $resource_dir/libs | sed '\~//~d'
 end
-echo Build_Time_UTC=2021-12-10_10:21:20
+echo Build_Time_UTC=2021-12-11_04:53:18
 set prefix "[Progynosh]"
 set_color cyan
 echo "$prefix progynosh fish shell script dev manager | by tsingkwai@protonmail.com (tsingkwai.ruzhtw.top)"
@@ -554,9 +605,11 @@ case transfer
     echo "$prefix Unexpected input in [app.progynosh.transfer.MainActivity]{$argv[1]}"
     set_color normal
   end
+case new
+  fish_new $argv[2] $argv[3]
 case v version
   set_color yellow
-  echo "FrostFlower@build1"
+  echo "FrostFlower@build3"
   set_color normal
 case h help '*'
   help_echo

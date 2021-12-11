@@ -12,9 +12,9 @@ function build
     echo "$prefix Building from $resource_dir/"
   else
     set_color red
-      echo "$prefix No such resource folder found,process the argv as the output name,building from $resource_dir/"
-      set build_output $resource_dir
-      set resource_dir .
+    set build_output $resource_dir
+    set resource_dir .
+    echo "$prefix No such resource folder found,process the argv as the output name,building from $resource_dir/"
   end
   if test -e $build_output
     set_color red
