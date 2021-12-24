@@ -51,6 +51,8 @@ function help_echo
               -argv[2] : the resource folder,default is the folder currently in
               -argv[3] : Set the name of output file,default is ./app
 
+             console >>> An interactive console for progynosh dev
+
              get argv[2] >>> get libs from online repo
               -argv[2] : Name of the libs , view the list on github.com/happyeggchen/progynosh-script-source
 
@@ -211,7 +213,10 @@ function build
   for blocks in (find $resource_dir/codes -type f | sed 's|^./||')
     cat $resource_dir/$blocks >> $build_output
   end
-  echo "echo Build_Time_UTC=$build_time" >> $build_output
+  if [ "$build_lib" = "1" ]
+  else
+    echo "echo Build_Time_UTC=$build_time" >> $build_output
+  end
   cat $resource_dir/configs/main.fish >> $build_output
   chmod +x $build_output
   set_color green
@@ -563,6 +568,64 @@ git add .
 git commit -m $commit_msg
 git push
 end
+function console
+while [ 0 = 0 ]
+read -P "[Progynosh Console] >>> " console_opt -a
+  switch $console_opt[1]
+  case install
+    install progynosh
+  case uninstall
+    uninstall progynosh
+  case init
+    init $console_opt[2]
+  case build
+    if [ "$console_opt[2]" = "-l" ]
+      set -lx build_lib 1
+      build $console_opt[3] $console_opt[4]
+    else
+      set -lx build_lib 0
+      build $console_opt[2] $console_opt[3]
+    end
+  case bundle
+    bundle $console_opt[2] $console_opt[3] $console_opt[4] $console_opt[5]
+  case get
+    get $console_opt[2]
+  case list
+    list $console_opt[2]
+  case remove
+    remove $console_opt[2] $console_opt[3]
+  case push
+    push $console_opt[2]
+  case transfer
+    switch $console_opt[2]
+    case 1
+      candlelight2cloudgirl $console_opt[3]
+    case 2
+      candlelight2frostflower $console_opt[3]
+    case h help '*'
+      set_color red
+      echo "$prefix Unexpected input in [transfer.progynosh]{$console_opt[1]}"
+      set_color normal
+    end
+  case new
+    fish_new $console_opt[2] $console_opt[3]
+  case console
+    console
+  case v version
+    set_color yellow
+    echo "FrostFlower@build4"
+    set_color normal
+  case exit
+    exit
+  case run
+    $console_opt[2..-1]
+  case h help
+    help_echo
+  case p '*'
+    echo "$prefix Unexpected input"
+  end
+end
+end
 function list -d "list mods"
 set -g resource_dir $argv[1]
   if [ "$argv[1]" = "" ]
@@ -570,7 +633,7 @@ set -g resource_dir $argv[1]
   end
 ls $resource_dir/libs | sed '\~//~d'
 end
-echo Build_Time_UTC=2021-12-11_09:12:30
+echo Build_Time_UTC=2021-12-24_12:34:56
 set prefix "[Progynosh]"
 set_color cyan
 echo "$prefix progynosh fish shell script dev manager | by tsingkwai@protonmail.com (tsingkwai.ruzhtw.top)"
@@ -583,7 +646,13 @@ case uninstall
 case init
   init $argv[2]
 case build
-  build $argv[2] $argv[3]
+  if [ "$argv[2]" = "-l" ]
+    set -lx build_lib 1
+    build $argv[3] $argv[4]
+  else
+    set -lx build_lib 0
+    build $argv[2] $argv[3]
+  end
 case bundle
   bundle $argv[2] $argv[3] $argv[4] $argv[5]
 case get
@@ -602,14 +671,16 @@ case transfer
     candlelight2frostflower $argv[3]
   case h help '*'
     set_color red
-    echo "$prefix Unexpected input in [app.progynosh.transfer.MainActivity]{$argv[1]}"
+    echo "$prefix Unexpected input in [transfer.progynosh]{$argv[1]}"
     set_color normal
   end
 case new
   fish_new $argv[2] $argv[3]
+case console
+  console
 case v version
   set_color yellow
-  echo "FrostFlower@build3"
+  echo "FrostFlower@build4"
   set_color normal
 case h help '*'
   help_echo

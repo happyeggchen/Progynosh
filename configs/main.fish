@@ -10,7 +10,13 @@ case uninstall
 case init
   init $argv[2]
 case build
-  build $argv[2] $argv[3]
+  if [ "$argv[2]" = "-l" ]
+    set -lx build_lib 1
+    build $argv[3] $argv[4]
+  else
+    set -lx build_lib 0
+    build $argv[2] $argv[3]
+  end
 case bundle
   bundle $argv[2] $argv[3] $argv[4] $argv[5]
 case get
@@ -29,14 +35,16 @@ case transfer
     candlelight2frostflower $argv[3]
   case h help '*'
     set_color red
-    echo "$prefix Unexpected input in [app.progynosh.transfer.MainActivity]{$argv[1]}"
+    echo "$prefix Unexpected input in [transfer.progynosh]{$argv[1]}"
     set_color normal
   end
 case new
   fish_new $argv[2] $argv[3]
+case console
+  console
 case v version
   set_color yellow
-  echo "FrostFlower@build3"
+  echo "FrostFlower@build4"
   set_color normal
 case h help '*'
   help_echo
