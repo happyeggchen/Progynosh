@@ -24,6 +24,8 @@ function help_echo
               -argv[2] : the resource folder,default is the folder currently in
               -argv[3] : Set the name of output file,default is ./app
 
+             console >>> An interactive console for progynosh dev
+
              get argv[2] >>> get libs from online repo
               -argv[2] : Name of the libs , view the list on github.com/happyeggchen/progynosh-script-source
 

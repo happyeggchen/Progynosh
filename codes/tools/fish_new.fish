@@ -31,7 +31,7 @@ else
   	    exit
       end
   end
-  if mkdir -p $resource_dir/codes/(dirname $newfishscript);printf "function $newfishscriptbasename\nend" > $resource_dir/codes/$newfishscript.fish
+  if mkdir -p $resource_dir/codes/(dirname $newfishscript);printf "function $newfishscriptbasename\n\nend" > $resource_dir/codes/$newfishscript.fish
     set_color green
     echo "$prefix Processed and succeeded"
     set_color normal

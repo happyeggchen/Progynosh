@@ -35,7 +35,10 @@ function build
   for blocks in (find $resource_dir/codes -type f | sed 's|^./||')
     cat $resource_dir/$blocks >> $build_output
   end
-  echo "echo Build_Time_UTC=$build_time" >> $build_output
+  if [ "$build_lib" = "1" ]
+  else
+    echo "echo Build_Time_UTC=$build_time" >> $build_output
+  end
   cat $resource_dir/configs/main.fish >> $build_output
   chmod +x $build_output
   set_color green
