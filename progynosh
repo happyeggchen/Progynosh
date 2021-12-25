@@ -557,6 +557,7 @@ function get -d "get libs from online repo"
   echo "$prefix failed"
   set_color normal
   end
+  cd ..
 end
 function push -d "auto gitpush"
 if [ "$argv[1]" = "" ]
@@ -633,7 +634,7 @@ set -g resource_dir $argv[1]
   end
 ls $resource_dir/libs | sed '\~//~d'
 end
-echo Build_Time_UTC=2021-12-24_12:34:56
+echo Build_Time_UTC=2021-12-25_02:04:51
 set prefix "[Progynosh]"
 set_color cyan
 echo "$prefix progynosh fish shell script dev manager | by tsingkwai@protonmail.com (tsingkwai.ruzhtw.top)"

@@ -16,4 +16,5 @@ function get -d "get libs from online repo"
   echo "$prefix failed"
   set_color normal
   end
+  cd ..
 end
