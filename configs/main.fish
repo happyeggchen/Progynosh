@@ -44,7 +44,7 @@ case console
   console
 case v version
   set_color yellow
-  echo "FrostFlower@build4"
+  echo "FrostFlower@build5"
   set_color normal
 case h help '*'
   help_echo

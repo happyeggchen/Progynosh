@@ -621,7 +621,7 @@ read -P "[Progynosh Console] >>> " console_opt -a
   case h help
     help_echo
   case p '*'
-    $console_opt[2..-1]
+    $console_opt[1..-1]
   end
 end
 end
@@ -632,7 +632,7 @@ set -g resource_dir $argv[1]
   end
 ls $resource_dir/libs | sed '\~//~d'
 end
-echo Build_Time_UTC=2022-01-01_02:42:06
+echo Build_Time_UTC=2022-01-01_02:56:34
 set prefix "[Progynosh]"
 set_color cyan
 echo "$prefix progynosh fish shell script dev manager | by tsingkwai@protonmail.com (tsingkwai.ruzhtw.top)"

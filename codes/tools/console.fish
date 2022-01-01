@@ -50,7 +50,7 @@ read -P "[Progynosh Console] >>> " console_opt -a
   case h help
     help_echo
   case p '*'
-    $console_opt[2..-1]
+    $console_opt[1..-1]
   end
 end
 end
