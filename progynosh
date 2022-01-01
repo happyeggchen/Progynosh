@@ -632,7 +632,7 @@ set -g resource_dir $argv[1]
   end
 ls $resource_dir/libs | sed '\~//~d'
 end
-echo Build_Time_UTC=2022-01-01_02:56:34
+echo Build_Time_UTC=2022-01-01_02:57:35
 set prefix "[Progynosh]"
 set_color cyan
 echo "$prefix progynosh fish shell script dev manager | by tsingkwai@protonmail.com (tsingkwai.ruzhtw.top)"
@@ -679,7 +679,7 @@ case console
   console
 case v version
   set_color yellow
-  echo "FrostFlower@build4"
+  echo "FrostFlower@build5"
   set_color normal
 case h help '*'
   help_echo
