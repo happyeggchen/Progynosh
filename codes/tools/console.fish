@@ -43,16 +43,14 @@ read -P "[Progynosh Console] >>> " console_opt -a
     console
   case v version
     set_color yellow
-    echo "FrostFlower@build4"
+    echo "FrostFlower@build5"
     set_color normal
   case exit
     exit
-  case run
-    $console_opt[2..-1]
   case h help
     help_echo
   case p '*'
-    echo "$prefix Unexpected input"
+    $console_opt[2..-1]
   end
 end
 end
