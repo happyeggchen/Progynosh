@@ -557,6 +557,7 @@ function get -d "get libs from online repo"
   echo "$prefix failed"
   set_color normal
   end
+  cd ..
 end
 function push -d "auto gitpush"
 if [ "$argv[1]" = "" ]
@@ -613,16 +614,14 @@ read -P "[Progynosh Console] >>> " console_opt -a
     console
   case v version
     set_color yellow
-    echo "FrostFlower@build4"
+    echo "FrostFlower@build5"
     set_color normal
   case exit
     exit
-  case run
-    $console_opt[2..-1]
   case h help
     help_echo
   case p '*'
-    echo "$prefix Unexpected input"
+    $console_opt[1..-1]
   end
 end
 end
@@ -633,7 +632,7 @@ set -g resource_dir $argv[1]
   end
 ls $resource_dir/libs | sed '\~//~d'
 end
-echo Build_Time_UTC=2021-12-24_12:34:56
+echo Build_Time_UTC=2022-01-01_02:57:35
 set prefix "[Progynosh]"
 set_color cyan
 echo "$prefix progynosh fish shell script dev manager | by tsingkwai@protonmail.com (tsingkwai.ruzhtw.top)"
@@ -680,7 +679,7 @@ case console
   console
 case v version
   set_color yellow
-  echo "FrostFlower@build4"
+  echo "FrostFlower@build5"
   set_color normal
 case h help '*'
   help_echo
