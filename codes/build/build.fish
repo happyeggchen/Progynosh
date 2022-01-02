@@ -31,9 +31,11 @@ function build
   end
   for mod in (cat $resource_dir/configs/pynsh.mod)
     cat $resource_dir/libs/$mod >> $build_output
+    echo >> $build_output
   end
   for blocks in (find $resource_dir/codes -type f | sed 's|^./||')
     cat $resource_dir/$blocks >> $build_output
+    echo >> $build_output
   end
   if [ "$build_lib" = "1" ]
   else
