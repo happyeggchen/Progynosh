@@ -1,4 +1,5 @@
 #!/usr/bin/env fish
+
 function checkdependence
   if test -e $argv
     echo -e "\033[32m[checkdependence]check passed - $argv exist\033[0m"
@@ -25,6 +26,7 @@ end
 function list_menu
 ls $argv | sed '\~//~d'
 end
+
 function help_echo
   echo "==========Help Documentation=========="
   set_color green
@@ -75,6 +77,7 @@ function help_echo
             version >>> show the version of progynosh"
   echo "========================================"
 end
+
 function install
 set installname $argv[1]
   set dir (realpath (dirname (status -f)))
@@ -92,6 +95,7 @@ set installname $argv[1]
   echo "$prefix Removed"
   set_color normal
 end
+
 function crescent-choose -d "draw a tui for choosing"
 crescent-backend
 set crescent_title $argv[1]
@@ -176,6 +180,7 @@ end
 #trash collection
 set -e crescent_backend
 end
+
 function build
   set build_time (date +"%Y-%m-%d_%T" -u)
   set resource_dir $argv[1]
@@ -209,9 +214,11 @@ function build
   end
   for mod in (cat $resource_dir/configs/pynsh.mod)
     cat $resource_dir/libs/$mod >> $build_output
+    echo >> $build_output
   end
   for blocks in (find $resource_dir/codes -type f | sed 's|^./||')
     cat $resource_dir/$blocks >> $build_output
+    echo >> $build_output
   end
   if [ "$build_lib" = "1" ]
   else
@@ -223,6 +230,7 @@ function build
   echo "$prefix Built"
   set_color normal
 end
+
 function init-files -d "write essential content to structure files"
 set resource_dir $argv[1]
 echo "header" > $resource_dir/configs/pynsh.mod
@@ -267,6 +275,7 @@ end" > $resource_dir/libs/base
 touch $resource_dir/configs/main.fish
 echo "FrostFlower" > $resource_dir/configs/version.lock
 end
+
 function init
   set -g resource_dir $argv[1]
   if [ "$argv[1]" = "" ]
@@ -282,6 +291,7 @@ function init
     set_color normal
   set -e resource_dir
 end
+
 function bundle -d "bundle data with script"
   set bundle_mode $argv[1]
   set resource_dir $argv[2]
@@ -393,6 +403,7 @@ crescent gauge 'Progynosh bundler' 'Building' 76
     exit
   end
 end
+
 function candlelight2cloudgirl -d "update the folder structure"
   set resource_dir $argv[1]
   if [ "$argv[1]" = "" ]
@@ -429,6 +440,7 @@ function candlelight2cloudgirl -d "update the folder structure"
     echo "$prefix Done,your project had been rebased"
     set_color normal
 end
+
 function candlelight2frostflower -d "update the folder structure"
   set resource_dir $argv[1]
   if [ "$argv[1]" = "" ]
@@ -465,6 +477,7 @@ function candlelight2frostflower -d "update the folder structure"
     echo "$prefix Done,your project had been rebased"
     set_color normal
 end
+
 function fish_new -d "create a function"
 set resource_dir $argv[1]
 set newfishscript $argv[2]
@@ -509,6 +522,7 @@ else
   end
 end
 end
+
 function remove -d "remove a mod from libs"
   set resource_dir $argv[1]
   set mod $argv[2]
@@ -539,6 +553,7 @@ function remove -d "remove a mod from libs"
     set_color normal
   end
 end
+
 function get -d "get libs from online repo"
   set -g modulename $argv[1]
   if [ "$argv[1]" = "" ]
@@ -559,6 +574,7 @@ function get -d "get libs from online repo"
   end
   cd ..
 end
+
 function push -d "auto gitpush"
 if [ "$argv[1]" = "" ]
   set commit_msg (date +"%Y-%m-%d_%T" -u)
@@ -569,6 +585,7 @@ git add .
 git commit -m $commit_msg
 git push
 end
+
 function console
 while [ 0 = 0 ]
 read -P "[Progynosh Console] >>> " console_opt -a
@@ -625,6 +642,7 @@ read -P "[Progynosh Console] >>> " console_opt -a
   end
 end
 end
+
 function list -d "list mods"
 set -g resource_dir $argv[1]
   if [ "$argv[1]" = "" ]
@@ -632,7 +650,8 @@ set -g resource_dir $argv[1]
   end
 ls $resource_dir/libs | sed '\~//~d'
 end
-echo Build_Time_UTC=2022-01-01_02:57:35
+
+echo Build_Time_UTC=2022-01-08_08:38:14
 set prefix "[Progynosh]"
 set_color cyan
 echo "$prefix progynosh fish shell script dev manager | by tsingkwai@protonmail.com (tsingkwai.ruzhtw.top)"
@@ -679,7 +698,7 @@ case console
   console
 case v version
   set_color yellow
-  echo "FrostFlower@build5"
+  echo "pomelo@build1"
   set_color normal
 case h help '*'
   help_echo
