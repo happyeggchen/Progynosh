@@ -44,7 +44,7 @@ case console
   console
 case v version
   set_color yellow
-  echo "pomelo@build1"
+  echo "pomelo@build2"
   set_color normal
 case h help '*'
   help_echo

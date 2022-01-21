@@ -30,25 +30,23 @@ function bundle -d "bundle data with script"
     echo "$prefix Bundling from $resource_dir"
     set_color normal
     mkdir -p $resource_dir/bundle_crafttable
-    mv $resource_dir/$bundle_data $resource_dir/bundle_crafttable
+    cp -r $resource_dir/$bundle_data $resource_dir/bundle_crafttable
     build $resource_dir $resource_dir/bundle_crafttable/bundle_app_core
+    cp /usr/bin/fish $resource_dir/bundle_crafttable/fish
+    chmod +x $resource_dir/bundle_crafttable/fish
     tar zcf bundle_data.tar.gz $resource_dir/bundle_crafttable/
-    echo "#!/usr/bin/fish
-set extract_time (date +"%Y-%m-%d_%T" -u)
-mkdir progynosh_bundle_runtime\$extract_time
-set dir (realpath (dirname (status -f)))
-set filename (status --current-filename)
-set startline (awk '/^progynosh_bundle_runtime_data_below/ {print NR + 1; exit 0; }' \$dir/\$filename)
-tail -n+\$startline \$dir/\$filename | tar zxf - -C ./progynosh_bundle_runtime\$extract_time
-cd progynosh_bundle_runtime\$extract_time/bundle_crafttable/
-./bundle_app_core
-rm -rf progynosh_bundle_runtime\$extract_time
+    echo '#!/usr/bin/bash
+extract_time=$(date +"%Y-%m-%d_%T" -u)
+mkdir progynosh_bundle_runtime$extract_time
+startline=`awk \'/^progynosh_bundle_runtime_data_below/ {print NR + 1; exit 0; }\' $0`
+tail -n+$startline $0 | tar zxf - -C ./progynosh_bundle_runtime$extract_time
+cd progynosh_bundle_runtime$extract_time/bundle_crafttable/ && ./fish bundle_app_core && cd ../../
+rm -rf ./progynosh_bundle_runtime$extract_time
 exit 0
-progynosh_bundle_runtime_data_below" > $resource_dir/$bundle_output
+progynosh_bundle_runtime_data_below' > $resource_dir/$bundle_output
     cat $resource_dir/bundle_data.tar.gz >> $resource_dir/$bundle_output
     chmod +x $resource_dir/$bundle_output
     rm -f $resource_dir/bundle_data.tar.gz
-    mv $resource_dir/bundle_crafttable/$bundle_data $resource_dir
     rm -rf $resource_dir/bundle_crafttable
     set_color green
     echo "$prefix Bundled"
@@ -71,22 +69,21 @@ progynosh_bundle_runtime_data_below" > $resource_dir/$bundle_output
     set_color normal
     mkdir -p $resource_dir/bundle_crafttable
     crescent gauge 'Progynosh bundler' 'Building' 25
-    mv $resource_dir/$bundle_data $resource_dir/bundle_crafttable
+    cp -r $resource_dir/$bundle_data $resource_dir/bundle_crafttable
     build $resource_dir $resource_dir/bundle_crafttable/bundle_app_core
+    cp /usr/bin/fish $resource_dir/bundle_crafttable/fish
+    chmod +x $resource_dir/bundle_crafttable/fish
     crescent gauge 'Progynosh bundler' 'Building' 50
     tar zcf bundle_data.tar.gz $resource_dir/bundle_crafttable/*
-    echo "#!/usr/bin/fish
-set extract_time (date +"%Y-%m-%d_%T" -u)
-mkdir progynosh_bundle_runtime\$extract_time
-set dir (realpath (dirname (status -f)))
-set filename (status --current-filename)
-set startline (awk '/^progynosh_bundle_runtime_data_below/ {print NR + 1; exit 0; }' \$dir/\$filename)
-tail -n+\$startline \$dir/\$filename | tar zxf - -C ./progynosh_bundle_runtime\$extract_time
-cd progynosh_bundle_runtime\$extract_time/bundle_crafttable/
-./bundle_app_core
-rm -rf progynosh_bundle_runtime\$extract_time
+    echo '#!/usr/bin/bash
+extract_time=$(date +"%Y-%m-%d_%T" -u)
+mkdir progynosh_bundle_runtime$extract_time
+startline=`awk \'/^progynosh_bundle_runtime_data_below/ {print NR + 1; exit 0; }\' $0`
+tail -n+$startline $0 | tar zxf - -C ./progynosh_bundle_runtime$extract_time
+cd progynosh_bundle_runtime$extract_time/bundle_crafttable/ && ./fish bundle_app_core && cd ../../
+rm -rf ./progynosh_bundle_runtime$extract_time
 exit 0
-progynosh_bundle_runtime_data_below" > $resource_dir/$bundle_output
+progynosh_bundle_runtime_data_below' > $resource_dir/$bundle_output
 crescent gauge 'Progynosh bundler' 'Building' 76
     cat $resource_dir/bundle_data.tar.gz >> $resource_dir/$bundle_output
     crescent gauge 'Progynosh bundler' 'Building' 85
@@ -94,9 +91,8 @@ crescent gauge 'Progynosh bundler' 'Building' 76
     crescent gauge 'Progynosh bundler' 'Building' 91
     rm -f $resource_dir/bundle_data.tar.gz
     crescent gauge 'Progynosh bundler' 'Building' 95
-    mv $resource_dir/bundle_crafttable/$bundle_data $resource_dir
-    crescent gauge 'Progynosh bundler' 'Building' 98
     rm -rf $resource_dir/bundle_crafttable
+    crescent gauge 'Progynosh bundler' 'Building' 98
     crescent gauge 'Progynosh bundler' 'Building' 100
     echo
     set_color green
