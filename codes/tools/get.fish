@@ -8,9 +8,12 @@ function get -d "get libs from online repo"
         if curl -o $target_module -s -L "https://github.com/happyeggchen/progynosh-script-source/raw/main/$target_module/$target_module"
             logger 1 "Processed and succeeded"
         else
-            logger 0 "Failed"
+            logger 0 Failed
         end
         cd ..
-        echo $target_module >> configs/pynsh.mod
+        if grep -qs $target_module configs/pynsh.mod
+        else
+            echo $target_module >>configs/pynsh.mod
+        end
     end
 end

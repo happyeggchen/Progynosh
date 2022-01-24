@@ -659,10 +659,13 @@ function get -d "get libs from online repo"
         if curl -o $target_module -s -L "https://github.com/happyeggchen/progynosh-script-source/raw/main/$target_module/$target_module"
             logger 1 "Processed and succeeded"
         else
-            logger 0 "Failed"
+            logger 0 Failed
         end
         cd ..
-        echo $target_module >> configs/pynsh.mod
+        if grep -qs $target_module configs/pynsh.mod
+        else
+            echo $target_module >>configs/pynsh.mod
+        end
     end
 end
 
@@ -740,7 +743,7 @@ set -lx resource_dir $argv[1]
 ls $resource_dir/libs | sed '\~//~d'
 end
 
-echo Build_Time_UTC=2022-01-24_02:48:21
+echo Build_Time_UTC=2022-01-24_02:51:19
 set prefix "[Progynosh]"
 set_color cyan
 echo "$prefix progynosh fish shell script dev manager | by tsingkwai@protonmail.com (tsingkwai.ruzhtw.top)"
