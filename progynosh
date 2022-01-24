@@ -95,7 +95,7 @@ end
 
 function install
 set installname $argv[1]
-  set dir (realpath (dirname (status -f)))
+  set dir (pwd)
   set filename (status --current-filename)
   chmod +x $dir/$filename
   sudo cp $dir/$filename /usr/bin/$installname
@@ -218,7 +218,7 @@ function logger-debug
 end
 function logger-success
   set_color green
-  echo "$prefix [Successed] $argv[1..-1]"
+  echo "$prefix [Succeeded] $argv[1..-1]"
   set_color normal
 end
 function logger -d "a lib to print msg quickly"
@@ -743,7 +743,7 @@ set -lx resource_dir $argv[1]
 ls $resource_dir/libs | sed '\~//~d'
 end
 
-echo Build_Time_UTC=2022-01-24_02:51:19
+echo Build_Time_UTC=2022-01-24_02:56:05
 set prefix "[Progynosh]"
 set_color cyan
 echo "$prefix progynosh fish shell script dev manager | by tsingkwai@protonmail.com (tsingkwai.ruzhtw.top)"
