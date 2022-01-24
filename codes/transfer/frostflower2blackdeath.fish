@@ -1,16 +1,22 @@
-function init-files -d "write essential content to structure files"
+function frostflower2blackdeath
     set resource_dir $argv[1]
-    echo header >$resource_dir/configs/pynsh.mod
-    echo "#!/usr/bin/env fish" >$resource_dir/libs/header
-    echo "" >$resource_dir/docs/LICENSE
-    echo 'A progynosh fish script doc
-===========================
-This is a script dev manager for fish script shell
->>>>> How To <<<<<
-	1 >	write your script as functions in $resource_dir/codes
-	2 >	call them from $resource_dir/configs/main.fish
-	3 >	use progynosh build to build a final fish script' >$resource_dir/docs/handbook.md
-echo 'function checkdependence
+    if [ "$argv[1]" = "" ]
+        set resource_dir '.'
+    end
+    if test (cat $resource_dir/configs/version.lock) = FrostFlower; or test (cat $resource_dir/configs/version.lock) = cloudgirl; or test (cat $resource_dir/configs/version.lock) = CloudGirl
+    else
+        logger 4 "Only FrostFlower or cloudgirl can be transferred to BlackDeath,are you sure the sturcture of your project meet the requirment?"
+        read -n1 -P "$prefix >>> " _version_check_
+        switch $_version_check_
+            case Y y
+            case N n '*'
+                logger 0 Aborted
+                exit
+        end
+    end
+    logger 0 "Start rebasing your project at "$resource_dir""
+    logger 0 'Upgrading the base script package...'
+    echo 'function checkdependence
 set 34ylli8_deps_ok 1
 for 34ylli8_deps in $argv
     if command -q -v $34ylli8_deps
@@ -25,7 +31,7 @@ for 34ylli8_deps in $argv
 end
 if test "$34ylli8_deps_ok" -eq 0
     set_color red
-    echo "$prefix [error] "Please install "$34ylli8_deps_lost"to run this program"
+    echo "$prefix [error] "Please install "$34ylli8_deps_lost"to run this program""
     set_color normal
     exit
 end
@@ -50,8 +56,6 @@ end
 function list_menu
 ls $argv | sed '\~//~d'
 end' >$resource_dir/libs/base
-    echo 'set -lx prefix 
-switch $argv[1]
-end' >$resource_dir/configs/main.fish
     echo BlackDeath >$resource_dir/configs/version.lock
+    logger 1 Done
 end

@@ -4,31 +4,27 @@ function bundle -d "bundle data with script"
   set bundle_output $argv[3]
   set bundle_data $argv[4]
   if [ "$bundle_mode" = "" ]
-    set_color red
-    echo "$prefix Unexpected Input in [app.progynosh.bundle_mode],{empty}"
-    set_color normal
+    logger 4 "$prefix Unexpected Input in [bundle_mode.progynosh],{empty}"
     exit
   end
   switch $bundle_mode
   case cui
-    echo "$prefix Where the project located?{default: ./}"
+    logger 0 "$prefix Where the project located?{default: ./}"
     read -P "$prefix >>> " resource_dir
       if [ "$resource_dir" = "" ]
         set resource_dir .
       end
-    echo "$prefix What name you want to give the produced file?{default: bundle_app}"
+    logger 0 "$prefix What name you want to give the produced file?{default: bundle_app}"
     read -P "$prefix >>> " bundle_output
       if [ "$bundle_output" = "" ]
         set bundle_output bundle_app
       end
-    echo "$prefix Where the data folder located in?{default: res}"
+    logger 0 "$prefix Where the data folder located in?{default: res}"
     read -P "$prefix >>> " bundle_data
       if [ "$bundle_data" = "" ]
         set bundle_data res
       end
-    set_color yellow
-    echo "$prefix Bundling from $resource_dir"
-    set_color normal
+    logger 0 "$prefix Bundling from $resource_dir"
     mkdir -p $resource_dir/bundle_crafttable
     cp -r $resource_dir/$bundle_data $resource_dir/bundle_crafttable
     build $resource_dir $resource_dir/bundle_crafttable/bundle_app_core
@@ -48,9 +44,7 @@ progynosh_bundle_runtime_data_below' > $resource_dir/$bundle_output
     chmod +x $resource_dir/$bundle_output
     rm -f $resource_dir/bundle_data.tar.gz
     rm -rf $resource_dir/bundle_crafttable
-    set_color green
-    echo "$prefix Bundled"
-    set_color normal
+    logger 1 "Bundled"
   case tui
     set resource_dir (crescent input 'Progynosh bundler' 'Where the project located?{default: ./}')
     if [ "$resource_dir" = "" ]
@@ -64,9 +58,7 @@ progynosh_bundle_runtime_data_below' > $resource_dir/$bundle_output
     if [ "$bundle_data" = "" ]
       set bundle_data res
     end
-    set_color yellow
     crescent gauge 'Progynosh bundler' 'Building' 0
-    set_color normal
     mkdir -p $resource_dir/bundle_crafttable
     crescent gauge 'Progynosh bundler' 'Building' 25
     cp -r $resource_dir/$bundle_data $resource_dir/bundle_crafttable
@@ -95,13 +87,9 @@ crescent gauge 'Progynosh bundler' 'Building' 76
     crescent gauge 'Progynosh bundler' 'Building' 98
     crescent gauge 'Progynosh bundler' 'Building' 100
     echo
-    set_color green
-    echo "$prefix Bundled"
-    set_color normal
+    logger 1 "Bundled"
   case h help '*'
-    set_color red
-    echo "$prefix Unexpected Input in [app.progynosh.bundle_mode],{$bundle_mode}"
-    set_color normal
+    logger 4 "$prefix Unexpected Input in [bundle_mode.progynosh],{$bundle_mode}"
     exit
   end
 end

@@ -43,6 +43,7 @@ function help_echo
               -argv[2] : version you want to transfer
                 -Available : (1) candlelight -> cloudgirl (just set the argv[2] as "1")
                              (2) candlelight -> FrostFlower (just set the argv[2] as "2")
+                             (2) cloudgirl/FrostFlower -> BlackDeath (just set the argv[2] as "2")
               -argv[3] : the project folder you want to trans,default is the folder currently in
 
             version >>> show the version of progynosh"
