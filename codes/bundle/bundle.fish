@@ -28,15 +28,13 @@ function bundle -d "bundle data with script"
     mkdir -p $resource_dir/bundle_crafttable
     cp -r $resource_dir/$bundle_data $resource_dir/bundle_crafttable
     build $resource_dir $resource_dir/bundle_crafttable/bundle_app_core
-    cp /usr/bin/fish $resource_dir/bundle_crafttable/fish
-    chmod +x $resource_dir/bundle_crafttable/fish
     tar zcf bundle_data.tar.gz $resource_dir/bundle_crafttable/
     echo '#!/usr/bin/bash
 extract_time=$(date +"%Y-%m-%d_%T" -u)
 mkdir progynosh_bundle_runtime$extract_time
 startline=`awk \'/^progynosh_bundle_runtime_data_below/ {print NR + 1; exit 0; }\' $0`
 tail -n+$startline $0 | tar zxf - -C ./progynosh_bundle_runtime$extract_time
-cd progynosh_bundle_runtime$extract_time/bundle_crafttable/ && ./fish bundle_app_core && cd ../../
+cd progynosh_bundle_runtime$extract_time/bundle_crafttable/ && fish bundle_app_core && cd ../../
 rm -rf ./progynosh_bundle_runtime$extract_time
 exit 0
 progynosh_bundle_runtime_data_below' > $resource_dir/$bundle_output
@@ -63,8 +61,6 @@ progynosh_bundle_runtime_data_below' > $resource_dir/$bundle_output
     crescent gauge 'Progynosh bundler' 'Building' 25
     cp -r $resource_dir/$bundle_data $resource_dir/bundle_crafttable
     build $resource_dir $resource_dir/bundle_crafttable/bundle_app_core
-    cp /usr/bin/fish $resource_dir/bundle_crafttable/fish
-    chmod +x $resource_dir/bundle_crafttable/fish
     crescent gauge 'Progynosh bundler' 'Building' 50
     tar zcf bundle_data.tar.gz $resource_dir/bundle_crafttable/*
     echo '#!/usr/bin/bash
@@ -72,7 +68,7 @@ extract_time=$(date +"%Y-%m-%d_%T" -u)
 mkdir progynosh_bundle_runtime$extract_time
 startline=`awk \'/^progynosh_bundle_runtime_data_below/ {print NR + 1; exit 0; }\' $0`
 tail -n+$startline $0 | tar zxf - -C ./progynosh_bundle_runtime$extract_time
-cd progynosh_bundle_runtime$extract_time/bundle_crafttable/ && ./fish bundle_app_core && cd ../../
+cd progynosh_bundle_runtime$extract_time/bundle_crafttable/ && fish bundle_app_core && cd ../../
 rm -rf ./progynosh_bundle_runtime$extract_time
 exit 0
 progynosh_bundle_runtime_data_below' > $resource_dir/$bundle_output

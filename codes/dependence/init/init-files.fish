@@ -25,7 +25,7 @@ for 34ylli8_deps in $argv
 end
 if test "$34ylli8_deps_ok" -eq 0
     set_color red
-    echo "$prefix [error] "Please install "$34ylli8_deps_lost"to run this program"
+    echo "$prefix [error] Please install "$34ylli8_deps_lost"to run this program"
     set_color normal
     exit
 end
@@ -48,7 +48,7 @@ function dir_exist
   end
 end
 function list_menu
-ls $argv | sed '\~//~d'
+ls $argv | sed \'\~//~d\'
 end' >$resource_dir/libs/base
     echo 'set -lx prefix 
 switch $argv[1]

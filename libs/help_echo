@@ -1,51 +1,55 @@
 function help_echo
-  echo "==========Help Documentation=========="
-  set_color green
-  echo "(./)progynosh argv[1]"
-  set_color normal
-  echo " -argv[1]:the command to execute"
-  echo "  -Available:
-             install >>> install to /usr/bin
-             uninstall >>> remove from /usr/bin
+ echo '
+Project Manager - Main
+(./)app [init, new, build] argvs
 
-             new argv[2] argv[3..-1] >>> create a new fish shell script in codes
-              -argv[2] : the name of resource folder,default is the folder currently in
-              -argv[3..-1] : The new script name
-              Example : (./)progynosh new . 'activity/test/hi'
+    Note: if the target repo is not defined(by default it is the last argv), progynosh will treat the current working directory as the target repo
 
-             init argv[2] >>> deploy the core files and structure for pynsh
-              -argv[2] : the name of resource folder,default is the folder currently in
+    init: Creates a new empty repo for your project
+        Note: argv[1] is the project name
 
-             bundle argv[2] >>> merge the script with a binary file
-              -argv[2] : guider
-                -Available :tui,cui
+    new: Create a new code block (a single fish shell function) in the folder code
+        Example: progynosh new network/inbound/test .
+        Note: argv[1] is the target code block you want to create, while the dot is the target repo
 
-             build argv[2] argv[3] >>> Combine the progynosh script file to one fish shell script
-              -argv[2] : the resource folder,default is the folder currently in
-              -argv[3] : Set the name of output file,default is ./app
+    build: Build your project
+        Example: progynosh build . app
+        or
+        Example: progynosh build app
+        Note: argv[1] is the target repo, argv[2] is the output, add -l to build a library 
 
-             console >>> An interactive console for progynosh dev
+Project Manager - Bundle
+(./)app bundle [cui, tui]
+    
+    Note: Bundle is a way to build your project with resource files.If the target repo is not defined(by default it is the last argv), progynosh will treat the current working directory as the target repo
 
-             get argv[2] >>> get libs from online repo
-              -argv[2] : Name of the libs , view the list on github.com/happyeggchen/progynosh-script-source
+    cui: An interact way to bundle things into your scripts
 
-             list argv[2] >>> listed installed libs
-             -argv[2] : the resource folder,default is the folder currently in
+    gui: An interact way to bundle things into your scripts, but with tui(dialog needs to be installed first)
 
-             remove argv[2] argv[3] >>> remove mods from libs
-              -argv[2] : the resource folder,default is the folder currently in
-              -argv[3] : the name of mods
+Project Manager - Misc
+(./)app [get, remove, list, console, push, transfer] argvs
 
-             push argv[2] >>> do a auto git push
-              -argv[2] : comments you want to commit,remember to use a ''
+    Note: if the target repo is not defined(by default it is the last argv), progynosh will treat the current working directory as the target repo
 
-             transfer argv[2] argv[3] >>> rebase your project to a newer progynosh version
-              -argv[2] : version you want to transfer
-                -Available : (1) candlelight -> cloudgirl (just set the argv[2] as "1")
-                             (2) candlelight -> FrostFlower (just set the argv[2] as "2")
-                             (2) cloudgirl/FrostFlower -> BlackDeath (just set the argv[2] as "2")
-              -argv[3] : the project folder you want to trans,default is the folder currently in
+    get: Grab libraries from online store
+        Note: argvs is the target libraries, view the list on github.com/happyeggchen/progynosh-script-source
 
-            version >>> show the version of progynosh"
-  echo "========================================"
+    remove: Remove a libraries from local
+        Note: argv[1] is the target repo, argv[2] is the target libraries
+
+    list: List all installed library
+
+    console: An interactive console for progynosh dev
+
+    push: Do an automatic git push
+        Note: argv[1] is the commit, if it is not defined, the commit will be set to current time in UTC
+
+    transfer: Rebase your project to a new version of progynosh
+        Note: argv[1] is the version that you want to transfer to(only upgrade, downgrade is not allowed!)
+        Available: 
+            (1)candlelight -> cloudgirl
+            (2)candlelight -> FrostFlower
+            (3)cloudgirl/FrostFlower -> BlackDeath
+'
 end

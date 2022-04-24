@@ -32,7 +32,7 @@ function dir_exist
   if test -d $argv[1]
   else
     set_color red
-    echo "$prefix [error] [checkdir] check failed - dir $argv[1] doesn't exist,going to makr one"
+    echo "$prefix [error] [checkdir] check failed - dir $argv[1] doesn't exist,going to make one"
     set_color normal
     mkdir $argv[1]
   end
@@ -42,55 +42,59 @@ ls $argv | sed ~//~d
 end
 
 function help_echo
-  echo "==========Help Documentation=========="
-  set_color green
-  echo "(./)progynosh argv[1]"
-  set_color normal
-  echo " -argv[1]:the command to execute"
-  echo "  -Available:
-             install >>> install to /usr/bin
-             uninstall >>> remove from /usr/bin
+ echo '
+Project Manager - Main
+(./)app [init, new, build] argvs
 
-             new argv[2] argv[3..-1] >>> create a new fish shell script in codes
-              -argv[2] : the name of resource folder,default is the folder currently in
-              -argv[3..-1] : The new script name
-              Example : (./)progynosh new . 'activity/test/hi'
+    Note: if the target repo is not defined(by default it is the last argv), progynosh will treat the current working directory as the target repo
 
-             init argv[2] >>> deploy the core files and structure for pynsh
-              -argv[2] : the name of resource folder,default is the folder currently in
+    init: Creates a new empty repo for your project
+        Note: argv[1] is the project name
 
-             bundle argv[2] >>> merge the script with a binary file
-              -argv[2] : guider
-                -Available :tui,cui
+    new: Create a new code block (a single fish shell function) in the folder code
+        Example: progynosh new network/inbound/test .
+        Note: argv[1] is the target code block you want to create, while the dot is the target repo
 
-             build argv[2] argv[3] >>> Combine the progynosh script file to one fish shell script
-              -argv[2] : the resource folder,default is the folder currently in
-              -argv[3] : Set the name of output file,default is ./app
+    build: Build your project
+        Example: progynosh build . app
+        or
+        Example: progynosh build app
+        Note: argv[1] is the target repo, argv[2] is the output, add -l to build a library 
 
-             console >>> An interactive console for progynosh dev
+Project Manager - Bundle
+(./)app bundle [cui, tui]
+    
+    Note: Bundle is a way to build your project with resource files.If the target repo is not defined(by default it is the last argv), progynosh will treat the current working directory as the target repo
 
-             get argv[2] >>> get libs from online repo
-              -argv[2] : Name of the libs , view the list on github.com/happyeggchen/progynosh-script-source
+    cui: An interact way to bundle things into your scripts
 
-             list argv[2] >>> listed installed libs
-             -argv[2] : the resource folder,default is the folder currently in
+    gui: An interact way to bundle things into your scripts, but with tui(dialog needs to be installed first)
 
-             remove argv[2] argv[3] >>> remove mods from libs
-              -argv[2] : the resource folder,default is the folder currently in
-              -argv[3] : the name of mods
+Project Manager - Misc
+(./)app [get, remove, list, console, push, transfer] argvs
 
-             push argv[2] >>> do a auto git push
-              -argv[2] : comments you want to commit,remember to use a ''
+    Note: if the target repo is not defined(by default it is the last argv), progynosh will treat the current working directory as the target repo
 
-             transfer argv[2] argv[3] >>> rebase your project to a newer progynosh version
-              -argv[2] : version you want to transfer
-                -Available : (1) candlelight -> cloudgirl (just set the argv[2] as "1")
-                             (2) candlelight -> FrostFlower (just set the argv[2] as "2")
-                             (2) cloudgirl/FrostFlower -> BlackDeath (just set the argv[2] as "2")
-              -argv[3] : the project folder you want to trans,default is the folder currently in
+    get: Grab libraries from online store
+        Note: argvs is the target libraries, view the list on github.com/happyeggchen/progynosh-script-source
 
-            version >>> show the version of progynosh"
-  echo "========================================"
+    remove: Remove a libraries from local
+        Note: argv[1] is the target repo, argv[2] is the target libraries
+
+    list: List all installed library
+
+    console: An interactive console for progynosh dev
+
+    push: Do an automatic git push
+        Note: argv[1] is the commit, if it is not defined, the commit will be set to current time in UTC
+
+    transfer: Rebase your project to a new version of progynosh
+        Note: argv[1] is the version that you want to transfer to(only upgrade, downgrade is not allowed!)
+        Available: 
+            (1)candlelight -> cloudgirl
+            (2)candlelight -> FrostFlower
+            (3)cloudgirl/FrostFlower -> BlackDeath
+'
 end
 
 function install
@@ -236,217 +240,129 @@ case 4
 end
 end
 
-function build
-    set build_time (date +"%Y-%m-%d_%T" -u)
+function remove -d "remove a mod from libs"
     set resource_dir $argv[1]
-    set build_output $argv[2]
+    set mod $argv[2..-1]
     if [ "$argv[1]" = "" ]
         set resource_dir .
     end
-    if [ "$argv[2]" = "" ]
-        set build_output app
-    end
     if test -d $resource_dir
-        echo "$prefix Building from $resource_dir/"
+        logger 1 "Removing libs from $resource_dir/libs"
     else
-        set build_output $resource_dir
+        set_color red
+        logger 3 "Resource folder $resource_dir not found,processing the argv[3] as the mod name"
+        set mod $resource_dir
         set resource_dir .
-        logger 3 "Resource folder $resource_dir not found,processing the argv[2] as the output name,building from $resource_dir/"
     end
-    if test -e $build_output
-        logger 3 "$prefix A file this name has existed,delete it anyway?[y/n]"
-        read -n1 -P "$prefix >>> " _delete_var_
-        switch $_delete_var_
-            case Y y
-                rm $build_output
-            case N n '*'
-                logger 0 "Aborted"
-                exit
-        end
-    end
-    for mod in (cat $resource_dir/configs/pynsh.mod)
-        cat $resource_dir/libs/$mod >>$build_output
-        echo >>$build_output
-    end
-    for blocks in (find $resource_dir/codes -type f | sed 's|^./||')
-        cat $resource_dir/$blocks >>$build_output
-        echo >>$build_output
-    end
-    if [ "$build_lib" = 1 ]
-    else
-        echo "echo Build_Time_UTC=$build_time" >>$build_output
-    end
-    cat $resource_dir/configs/main.fish >>$build_output
-    chmod +x $build_output
-    logger 1 Built
-end
-
-function init-files -d "write essential content to structure files"
-    set resource_dir $argv[1]
-    echo header >$resource_dir/configs/pynsh.mod
-    echo "#!/usr/bin/env fish" >$resource_dir/libs/header
-    echo "" >$resource_dir/docs/LICENSE
-    echo 'A progynosh fish script doc
-===========================
-This is a script dev manager for fish script shell
->>>>> How To <<<<<
-	1 >	write your script as functions in $resource_dir/codes
-	2 >	call them from $resource_dir/configs/main.fish
-	3 >	use progynosh build to build a final fish script' >$resource_dir/docs/handbook.md
-echo 'function checkdependence
-set 34ylli8_deps_ok 1
-for 34ylli8_deps in $argv
-    if command -q -v $34ylli8_deps
-    else
-        set 34ylli8_deps_ok 0
-        if test -z "$34ylli8_dep_lost"
-            set 34ylli8_deps_lost "$34ylli8_deps $34ylli8_deps_lost"
+    for target_module in $mod
+        if test -e $resource_dir/libs/$target_module
+            if rm $resource_dir/libs/$target_module
+                logger 1 "Removed library $target_module"
+            else
+                logger 4 "Can't remove $target_module,abort"
+            end
         else
-            set 34ylli8_deps_lost "$34ylli8_deps"
+            logger 4 "Nothing to remove,abort"
         end
     end
 end
-if test "$34ylli8_deps_ok" -eq 0
-    set_color red
-    echo "$prefix [error] "Please install "$34ylli8_deps_lost"to run this program"
-    set_color normal
-    exit
-end
-end
-function checknetwork
-  if curl -s -L $argv[1] | grep -q $argv[2]
-  else
-    set_color red
-    echo "$prefix [error] [checknetwork] check failed - check your network connection"
-    set_color normal
-  end
-end
-function dir_exist
-  if test -d $argv[1]
-  else
-    set_color red
-    echo "$prefix [error] [checkdir] check failed - dir $argv[1] doesn\'t exist,going to makr one"
-    set_color normal
-    mkdir $argv[1]
-  end
-end
-function list_menu
-ls $argv | sed '\~//~d'
-end' >$resource_dir/libs/base
-    echo 'set -lx prefix 
-switch $argv[1]
-end' >$resource_dir/configs/main.fish
-    echo BlackDeath >$resource_dir/configs/version.lock
+
+function get -d "get libs from online repo"
+    if [ "$argv" = "" ]
+        logger 4 "Unexpect input at [get.progynosh]{empty}"
+        exit
+    end
+    for target_module in $argv
+        cd libs
+        if curl -o $target_module -s -L "https://github.com/happyeggchen/progynosh-script-source/raw/main/$target_module/$target_module"
+            if cat "$target_module" | head -n2 | grep -qs function
+            logger 1 "Library -> $target_module installed"
+            else
+                logger 4 "Failed to install library -> $target_module, check the name and network, then try again"
+            end
+        else
+            logger 4 "Failed to install library -> $target_module, check the name and network, then try again"
+        end
+        cd ..
+        if grep -qs $target_module configs/pynsh.mod
+        else
+            echo $target_module >>configs/pynsh.mod
+        end
+    end
 end
 
-function init
-  set -g resource_dir $argv[1]
+function push -d "auto gitpush"
+if [ "$argv[1]" = "" ]
+  set commit_msg (date +"%Y-%m-%d_%T" -u)
+else
+  set commit_msg $argv[1]
+end
+git add .
+git commit -m $commit_msg
+git push
+end
+
+function console
+    while test 0 -eq 0
+        read -P "[Progynosh Console] >>> " console_opt -a
+        switch $console_opt[1]
+            case install
+                install progynosh
+            case uninstall
+                uninstall progynosh
+            case init
+                init $console_opt[2]
+            case build
+                if [ "$console_opt[2]" = -l ]
+                    set -lx build_lib 1
+                    build $console_opt[3] $console_opt[4]
+                else
+                    set -lx build_lib 0
+                    build $console_opt[2] $console_opt[3]
+                end
+            case bundle
+                bundle $console_opt[2] $console_opt[3] $console_opt[4] $console_opt[5]
+            case get
+                get $console_opt[2..-1]
+            case list
+                list $console_opt[2]
+            case remove
+                remove $console_opt[2] $console_opt[3]
+            case push
+                push $console_opt[2]
+            case transfer
+                switch $console_opt[2]
+                    case 1
+                        candlelight2cloudgirl $console_opt[3]
+                    case 2
+                        candlelight2frostflower $console_opt[3]
+                    case 3
+                        frostflower2blackdeath $console_opt[3]
+                    case h help '*'
+                        logger 4 "Unexpected input in [transfer.progynosh]{$console_opt[1]}"
+                end
+            case new
+                fish_new $console_opt[2] $console_opt[3..-1]
+            case console
+                console
+            case v version
+                logger 0 "Quicksand@build1"
+            case exit
+                exit
+            case h help
+                help_echo
+            case p '*'
+                $console_opt[1..-1]
+        end
+    end
+end
+
+function list -d "list mods"
+set -lx resource_dir $argv[1]
   if [ "$argv[1]" = "" ]
-    set -lx resource_dir .
+    set -g resource_dir .
   end
-    mkdir -p $resource_dir/codes
-    mkdir -p $resource_dir/configs
-    mkdir -p $resource_dir/docs
-    mkdir -p $resource_dir/libs
-    mkdir -p $resource_dir/res
-    init-files $resource_dir
-    logger 1 "Deployed"
-end
-
-function bundle -d "bundle data with script"
-  set bundle_mode $argv[1]
-  set resource_dir $argv[2]
-  set bundle_output $argv[3]
-  set bundle_data $argv[4]
-  if [ "$bundle_mode" = "" ]
-    logger 4 "$prefix Unexpected Input in [bundle_mode.progynosh],{empty}"
-    exit
-  end
-  switch $bundle_mode
-  case cui
-    logger 0 "$prefix Where the project located?{default: ./}"
-    read -P "$prefix >>> " resource_dir
-      if [ "$resource_dir" = "" ]
-        set resource_dir .
-      end
-    logger 0 "$prefix What name you want to give the produced file?{default: bundle_app}"
-    read -P "$prefix >>> " bundle_output
-      if [ "$bundle_output" = "" ]
-        set bundle_output bundle_app
-      end
-    logger 0 "$prefix Where the data folder located in?{default: res}"
-    read -P "$prefix >>> " bundle_data
-      if [ "$bundle_data" = "" ]
-        set bundle_data res
-      end
-    logger 0 "$prefix Bundling from $resource_dir"
-    mkdir -p $resource_dir/bundle_crafttable
-    cp -r $resource_dir/$bundle_data $resource_dir/bundle_crafttable
-    build $resource_dir $resource_dir/bundle_crafttable/bundle_app_core
-    cp /usr/bin/fish $resource_dir/bundle_crafttable/fish
-    chmod +x $resource_dir/bundle_crafttable/fish
-    tar zcf bundle_data.tar.gz $resource_dir/bundle_crafttable/
-    echo '#!/usr/bin/bash
-extract_time=$(date +"%Y-%m-%d_%T" -u)
-mkdir progynosh_bundle_runtime$extract_time
-startline=`awk \'/^progynosh_bundle_runtime_data_below/ {print NR + 1; exit 0; }\' $0`
-tail -n+$startline $0 | tar zxf - -C ./progynosh_bundle_runtime$extract_time
-cd progynosh_bundle_runtime$extract_time/bundle_crafttable/ && ./fish bundle_app_core && cd ../../
-rm -rf ./progynosh_bundle_runtime$extract_time
-exit 0
-progynosh_bundle_runtime_data_below' > $resource_dir/$bundle_output
-    cat $resource_dir/bundle_data.tar.gz >> $resource_dir/$bundle_output
-    chmod +x $resource_dir/$bundle_output
-    rm -f $resource_dir/bundle_data.tar.gz
-    rm -rf $resource_dir/bundle_crafttable
-    logger 1 "Bundled"
-  case tui
-    set resource_dir (crescent input 'Progynosh bundler' 'Where the project located?{default: ./}')
-    if [ "$resource_dir" = "" ]
-      set resource_dir .
-    end
-    set bundle_output (crescent input 'Progynosh bundler' 'What name you want to give the produced file?{default: bundle_app}')
-    if [ "$bundle_output" = "" ]
-      set bundle_output bundle_app
-    end
-    set bundle_data (crescent input 'Progynosh bundler' 'Where the data folder located in?{default: res}')
-    if [ "$bundle_data" = "" ]
-      set bundle_data res
-    end
-    crescent gauge 'Progynosh bundler' 'Building' 0
-    mkdir -p $resource_dir/bundle_crafttable
-    crescent gauge 'Progynosh bundler' 'Building' 25
-    cp -r $resource_dir/$bundle_data $resource_dir/bundle_crafttable
-    build $resource_dir $resource_dir/bundle_crafttable/bundle_app_core
-    cp /usr/bin/fish $resource_dir/bundle_crafttable/fish
-    chmod +x $resource_dir/bundle_crafttable/fish
-    crescent gauge 'Progynosh bundler' 'Building' 50
-    tar zcf bundle_data.tar.gz $resource_dir/bundle_crafttable/*
-    echo '#!/usr/bin/bash
-extract_time=$(date +"%Y-%m-%d_%T" -u)
-mkdir progynosh_bundle_runtime$extract_time
-startline=`awk \'/^progynosh_bundle_runtime_data_below/ {print NR + 1; exit 0; }\' $0`
-tail -n+$startline $0 | tar zxf - -C ./progynosh_bundle_runtime$extract_time
-cd progynosh_bundle_runtime$extract_time/bundle_crafttable/ && ./fish bundle_app_core && cd ../../
-rm -rf ./progynosh_bundle_runtime$extract_time
-exit 0
-progynosh_bundle_runtime_data_below' > $resource_dir/$bundle_output
-crescent gauge 'Progynosh bundler' 'Building' 76
-    cat $resource_dir/bundle_data.tar.gz >> $resource_dir/$bundle_output
-    crescent gauge 'Progynosh bundler' 'Building' 85
-    chmod +x $resource_dir/$bundle_output
-    crescent gauge 'Progynosh bundler' 'Building' 91
-    rm -f $resource_dir/bundle_data.tar.gz
-    crescent gauge 'Progynosh bundler' 'Building' 95
-    rm -rf $resource_dir/bundle_crafttable
-    crescent gauge 'Progynosh bundler' 'Building' 98
-    crescent gauge 'Progynosh bundler' 'Building' 100
-    echo
-    logger 1 "Bundled"
-  case h help '*'
-    logger 4 "$prefix Unexpected Input in [bundle_mode.progynosh],{$bundle_mode}"
-    exit
-  end
+ls $resource_dir/libs | sed '\~//~d'
 end
 
 function candlelight2cloudgirl -d "update the folder structure"
@@ -519,7 +435,7 @@ for 34ylli8_deps in $argv
 end
 if test "$34ylli8_deps_ok" -eq 0
     set_color red
-    echo "$prefix [error] "Please install "$34ylli8_deps_lost"to run this program""
+    echo "$prefix [error] Please install "$34ylli8_deps_lost"to run this program""
     set_color normal
     exit
 end
@@ -536,13 +452,13 @@ function dir_exist
   if test -d $argv[1]
   else
     set_color red
-    echo "$prefix [error] [checkdir] check failed - dir $argv[1] doesn\'t exist,going to makr one"
+    echo "$prefix [error] [checkdir] check failed - dir $argv[1] doesn\'t exist,going to make one"
     set_color normal
     mkdir $argv[1]
   end
 end
 function list_menu
-ls $argv | sed '\~//~d'
+ls $argv | sed \'\~//~d\'
 end' >$resource_dir/libs/base
     echo BlackDeath >$resource_dir/configs/version.lock
     logger 1 Done
@@ -585,6 +501,51 @@ function candlelight2frostflower -d "update the folder structure"
     set_color normal
 end
 
+function build
+    set build_time (date +"%Y-%m-%d_%T" -u)
+    set resource_dir $argv[1]
+    set build_output $argv[2]
+    if [ "$argv[1]" = "" ]
+        set resource_dir .
+    end
+    if [ "$argv[2]" = "" ]
+        set build_output app
+    end
+    if test -d $resource_dir
+        echo "$prefix Building from $resource_dir/"
+    else
+        set build_output $resource_dir
+        set resource_dir .
+        logger 3 "Resource folder $resource_dir not found,processing the argv[2] as the output name,building from $resource_dir/"
+    end
+    if test -e $build_output
+        logger 3 "$prefix A file this name has existed,delete it anyway?[y/n]"
+        read -n1 -P "$prefix >>> " _delete_var_
+        switch $_delete_var_
+            case Y y
+                rm $build_output
+            case N n '*'
+                logger 0 "Aborted"
+                exit
+        end
+    end
+    for mod in (cat $resource_dir/configs/pynsh.mod)
+        cat $resource_dir/libs/$mod >>$build_output
+        echo >>$build_output
+    end
+    for blocks in (find $resource_dir/codes -type f | sed 's|^./||')
+        cat $resource_dir/$blocks >>$build_output
+        echo >>$build_output
+    end
+    if [ "$build_lib" = 1 ]
+    else
+        echo "echo Build_Time_UTC=$build_time" >>$build_output
+    end
+    cat $resource_dir/configs/main.fish >>$build_output
+    chmod +x $build_output
+    logger 1 Built
+end
+
 function fish_new -d "create a function"
 set resource_dir $argv[1]
 set newfishscript $argv[2]
@@ -622,128 +583,171 @@ else
 end
 end
 
-function remove -d "remove a mod from libs"
-    set resource_dir $argv[1]
-    set mod $argv[2..-1]
-    if [ "$argv[1]" = "" ]
-        set resource_dir .
-    end
-    if test -d $resource_dir
-        logger 1 "Removing libs from $resource_dir/libs"
-    else
-        set_color red
-        logger 3 "Resource folder $resource_dir not found,processing the argv[3] as the mod name"
-        set mod $resource_dir
-        set resource_dir .
-    end
-    for target_module in $mod
-        if test -e $resource_dir/libs/$target_module
-            if rm $resource_dir/libs/$target_module
-                logger 1 Removed
-            else
-                logger 4 "Can't remove $mod,abort"
-            end
-        else
-            logger 4 "Nothing to remove,abort"
-        end
-    end
-end
-
-function get -d "get libs from online repo"
-    if [ "$argv" = "" ]
-        logger 4 "Unexpect input at [get.progynosh]{empty}"
-        exit
-    end
-    for target_module in $argv
-        cd libs
-        if curl -o $target_module -s -L "https://github.com/happyeggchen/progynosh-script-source/raw/main/$target_module/$target_module"
-            logger 1 "Processed and succeeded"
-        else
-            logger 0 Failed
-        end
-        cd ..
-        if grep -qs $target_module configs/pynsh.mod
-        else
-            echo $target_module >>configs/pynsh.mod
-        end
-    end
-end
-
-function push -d "auto gitpush"
-if [ "$argv[1]" = "" ]
-  set commit_msg (date +"%Y-%m-%d_%T" -u)
-else
-  set commit_msg $argv[1]
-end
-git add .
-git commit -m $commit_msg
-git push
-end
-
-function console
-    while test 0 -eq 0
-        read -P "[Progynosh Console] >>> " console_opt -a
-        switch $console_opt[1]
-            case install
-                install progynosh
-            case uninstall
-                uninstall progynosh
-            case init
-                init $console_opt[2]
-            case build
-                if [ "$console_opt[2]" = -l ]
-                    set -lx build_lib 1
-                    build $console_opt[3] $console_opt[4]
-                else
-                    set -lx build_lib 0
-                    build $console_opt[2] $console_opt[3]
-                end
-            case bundle
-                bundle $console_opt[2] $console_opt[3] $console_opt[4] $console_opt[5]
-            case get
-                get $console_opt[2..-1]
-            case list
-                list $console_opt[2]
-            case remove
-                remove $console_opt[2] $console_opt[3]
-            case push
-                push $console_opt[2]
-            case transfer
-                switch $console_opt[2]
-                    case 1
-                        candlelight2cloudgirl $console_opt[3]
-                    case 2
-                        candlelight2frostflower $console_opt[3]
-                    case 3
-                        frostflower2blackdeath $console_opt[3]
-                    case h help '*'
-                        logger 4 "Unexpected input in [transfer.progynosh]{$console_opt[1]}"
-                end
-            case new
-                fish_new $console_opt[2] $console_opt[3..-1]
-            case console
-                console
-            case v version
-                logger 0 "BlackDeath@build1"
-            case exit
-                exit
-            case h help
-                help_echo
-            case p '*'
-                $console_opt[1..-1]
-        end
-    end
-end
-
-function list -d "list mods"
-set -lx resource_dir $argv[1]
+function init
+  set -g resource_dir $argv[1]
   if [ "$argv[1]" = "" ]
-    set -g resource_dir .
+    set -lx resource_dir .
   end
-ls $resource_dir/libs | sed '\~//~d'
+    mkdir -p $resource_dir/codes
+    mkdir -p $resource_dir/configs
+    mkdir -p $resource_dir/docs
+    mkdir -p $resource_dir/libs
+    mkdir -p $resource_dir/res
+    init-files $resource_dir
+    logger 1 "Deployed"
 end
 
-echo Build_Time_UTC=2022-01-24_02:56:05
+function bundle -d "bundle data with script"
+  set bundle_mode $argv[1]
+  set resource_dir $argv[2]
+  set bundle_output $argv[3]
+  set bundle_data $argv[4]
+  if [ "$bundle_mode" = "" ]
+    logger 4 "$prefix Unexpected Input in [bundle_mode.progynosh],{empty}"
+    exit
+  end
+  switch $bundle_mode
+  case cui
+    logger 0 "$prefix Where the project located?{default: ./}"
+    read -P "$prefix >>> " resource_dir
+      if [ "$resource_dir" = "" ]
+        set resource_dir .
+      end
+    logger 0 "$prefix What name you want to give the produced file?{default: bundle_app}"
+    read -P "$prefix >>> " bundle_output
+      if [ "$bundle_output" = "" ]
+        set bundle_output bundle_app
+      end
+    logger 0 "$prefix Where the data folder located in?{default: res}"
+    read -P "$prefix >>> " bundle_data
+      if [ "$bundle_data" = "" ]
+        set bundle_data res
+      end
+    logger 0 "$prefix Bundling from $resource_dir"
+    mkdir -p $resource_dir/bundle_crafttable
+    cp -r $resource_dir/$bundle_data $resource_dir/bundle_crafttable
+    build $resource_dir $resource_dir/bundle_crafttable/bundle_app_core
+    tar zcf bundle_data.tar.gz $resource_dir/bundle_crafttable/
+    echo '#!/usr/bin/bash
+extract_time=$(date +"%Y-%m-%d_%T" -u)
+mkdir progynosh_bundle_runtime$extract_time
+startline=`awk \'/^progynosh_bundle_runtime_data_below/ {print NR + 1; exit 0; }\' $0`
+tail -n+$startline $0 | tar zxf - -C ./progynosh_bundle_runtime$extract_time
+cd progynosh_bundle_runtime$extract_time/bundle_crafttable/ && fish bundle_app_core && cd ../../
+rm -rf ./progynosh_bundle_runtime$extract_time
+exit 0
+progynosh_bundle_runtime_data_below' > $resource_dir/$bundle_output
+    cat $resource_dir/bundle_data.tar.gz >> $resource_dir/$bundle_output
+    chmod +x $resource_dir/$bundle_output
+    rm -f $resource_dir/bundle_data.tar.gz
+    rm -rf $resource_dir/bundle_crafttable
+    logger 1 "Bundled"
+  case tui
+    set resource_dir (crescent input 'Progynosh bundler' 'Where the project located?{default: ./}')
+    if [ "$resource_dir" = "" ]
+      set resource_dir .
+    end
+    set bundle_output (crescent input 'Progynosh bundler' 'What name you want to give the produced file?{default: bundle_app}')
+    if [ "$bundle_output" = "" ]
+      set bundle_output bundle_app
+    end
+    set bundle_data (crescent input 'Progynosh bundler' 'Where the data folder located in?{default: res}')
+    if [ "$bundle_data" = "" ]
+      set bundle_data res
+    end
+    crescent gauge 'Progynosh bundler' 'Building' 0
+    mkdir -p $resource_dir/bundle_crafttable
+    crescent gauge 'Progynosh bundler' 'Building' 25
+    cp -r $resource_dir/$bundle_data $resource_dir/bundle_crafttable
+    build $resource_dir $resource_dir/bundle_crafttable/bundle_app_core
+    crescent gauge 'Progynosh bundler' 'Building' 50
+    tar zcf bundle_data.tar.gz $resource_dir/bundle_crafttable/*
+    echo '#!/usr/bin/bash
+extract_time=$(date +"%Y-%m-%d_%T" -u)
+mkdir progynosh_bundle_runtime$extract_time
+startline=`awk \'/^progynosh_bundle_runtime_data_below/ {print NR + 1; exit 0; }\' $0`
+tail -n+$startline $0 | tar zxf - -C ./progynosh_bundle_runtime$extract_time
+cd progynosh_bundle_runtime$extract_time/bundle_crafttable/ && fish bundle_app_core && cd ../../
+rm -rf ./progynosh_bundle_runtime$extract_time
+exit 0
+progynosh_bundle_runtime_data_below' > $resource_dir/$bundle_output
+crescent gauge 'Progynosh bundler' 'Building' 76
+    cat $resource_dir/bundle_data.tar.gz >> $resource_dir/$bundle_output
+    crescent gauge 'Progynosh bundler' 'Building' 85
+    chmod +x $resource_dir/$bundle_output
+    crescent gauge 'Progynosh bundler' 'Building' 91
+    rm -f $resource_dir/bundle_data.tar.gz
+    crescent gauge 'Progynosh bundler' 'Building' 95
+    rm -rf $resource_dir/bundle_crafttable
+    crescent gauge 'Progynosh bundler' 'Building' 98
+    crescent gauge 'Progynosh bundler' 'Building' 100
+    echo
+    logger 1 "Bundled"
+  case h help '*'
+    logger 4 "$prefix Unexpected Input in [bundle_mode.progynosh],{$bundle_mode}"
+    exit
+  end
+end
+
+function init-files -d "write essential content to structure files"
+    set resource_dir $argv[1]
+    echo header >$resource_dir/configs/pynsh.mod
+    echo "#!/usr/bin/env fish" >$resource_dir/libs/header
+    echo "" >$resource_dir/docs/LICENSE
+    echo 'A progynosh fish script doc
+===========================
+This is a script dev manager for fish script shell
+>>>>> How To <<<<<
+	1 >	write your script as functions in $resource_dir/codes
+	2 >	call them from $resource_dir/configs/main.fish
+	3 >	use progynosh build to build a final fish script' >$resource_dir/docs/handbook.md
+echo 'function checkdependence
+set 34ylli8_deps_ok 1
+for 34ylli8_deps in $argv
+    if command -q -v $34ylli8_deps
+    else
+        set 34ylli8_deps_ok 0
+        if test -z "$34ylli8_dep_lost"
+            set 34ylli8_deps_lost "$34ylli8_deps $34ylli8_deps_lost"
+        else
+            set 34ylli8_deps_lost "$34ylli8_deps"
+        end
+    end
+end
+if test "$34ylli8_deps_ok" -eq 0
+    set_color red
+    echo "$prefix [error] Please install "$34ylli8_deps_lost"to run this program"
+    set_color normal
+    exit
+end
+end
+function checknetwork
+  if curl -s -L $argv[1] | grep -q $argv[2]
+  else
+    set_color red
+    echo "$prefix [error] [checknetwork] check failed - check your network connection"
+    set_color normal
+  end
+end
+function dir_exist
+  if test -d $argv[1]
+  else
+    set_color red
+    echo "$prefix [error] [checkdir] check failed - dir $argv[1] doesn\'t exist,going to makr one"
+    set_color normal
+    mkdir $argv[1]
+  end
+end
+function list_menu
+ls $argv | sed \'\~//~d\'
+end' >$resource_dir/libs/base
+    echo 'set -lx prefix 
+switch $argv[1]
+end' >$resource_dir/configs/main.fish
+    echo BlackDeath >$resource_dir/configs/version.lock
+end
+
+echo Build_Time_UTC=2022-04-24_09:34:16
 set prefix "[Progynosh]"
 set_color cyan
 echo "$prefix progynosh fish shell script dev manager | by tsingkwai@protonmail.com (tsingkwai.ruzhtw.top)"
@@ -789,7 +793,7 @@ switch $argv[1]
     case console
         console
     case v version
-        logger 0 "BlackDeath@build1"
+        logger 0 "Quicksand@build1"
     case h help '*'
         help_echo
 end

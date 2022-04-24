@@ -15,9 +15,9 @@ function remove -d "remove a mod from libs"
     for target_module in $mod
         if test -e $resource_dir/libs/$target_module
             if rm $resource_dir/libs/$target_module
-                logger 1 Removed
+                logger 1 "Removed library $target_module"
             else
-                logger 4 "Can't remove $mod,abort"
+                logger 4 "Can't remove $target_module,abort"
             end
         else
             logger 4 "Nothing to remove,abort"

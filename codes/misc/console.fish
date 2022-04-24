@@ -42,7 +42,7 @@ function console
             case console
                 console
             case v version
-                logger 0 "BlackDeath@build1"
+                logger 0 "Quicksand@build1"
             case exit
                 exit
             case h help
